@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -54,38 +55,70 @@
 
   <div id="help-modal" class="fixed inset-0 bg-black/90 z-[10015] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300">
     <div id="help-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
-      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
-        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-book-open mr-2"></i>App Manual</h3>
-        <button onclick="closeHelpModal()" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors">
+      <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50 gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
+        <h3 class="text-lg sm:text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md truncate flex-1"><i class="fa-solid fa-book-open mr-2"></i>App Manual</h3>
+        
+        <button onclick="closeHelpModal()" class="text-stone-400 hover:text-white text-xl sm:text-2xl w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors flex-shrink-0">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 text-stone-300 space-y-6">
+      <div id="help-body" class="p-6 overflow-y-auto flex-1 bg-stone-950/50 text-stone-300 space-y-6 text-sm sm:text-base leading-relaxed pb-12">
         <div>
           <h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-plug text-teal-500 mr-2"></i>1. Core Setup</h4>
-          <ul class="list-disc pl-5 text-sm space-y-1">
+          <ul class="list-disc pl-5 space-y-1">
             <li><strong class="text-stone-200">Microphone:</strong> Required for Tuner.</li>
             <li><strong class="text-stone-200">Keep Awake:</strong> Toggle in Settings to prevent screen dimming during a set.</li>
+            <li><strong class="text-stone-200">Stage Timer:</strong> Tap the clock in the top bar to start/pause your set runtime countdown.</li>
           </ul>
         </div>
         <div>
           <h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-bolt text-teal-500 mr-2"></i>2. Performance</h4>
-          <ul class="list-disc pl-5 text-sm space-y-1">
+          <ul class="list-disc pl-5 space-y-1">
             <li><strong class="text-stone-200">Navigation:</strong> Swipe, use arrows, or select from the top dropdown.</li>
+            <li><strong class="text-stone-200">Transpose:</strong> Tap + or - on the song slide to instantly shift keys.</li>
             <li><strong class="text-stone-200">Scroll:</strong> Auto-scroll lyrics based on tempo.</li>
           </ul>
         </div>
         <div>
           <h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-list-check text-teal-500 mr-2"></i>3. Setlist Management</h4>
-          <ul class="list-disc pl-5 text-sm space-y-1">
-            <li><strong class="text-stone-200">Edit Songs:</strong> Add, edit, or delete songs. Changes save locally automatically.</li>
-            <li><strong class="text-stone-200">Reorder:</strong> Drag and drop your setlist order.</li>
-            <li><strong class="text-stone-200">Export:</strong> Back up your custom setlist as a JSON file.</li>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong class="text-stone-200">Profiles:</strong> Save different setlists for different gigs in the Setlist Manager.</li>
+            <li><strong class="text-stone-200">ChordPro Support:</strong> Import .pro/.txt files! We automatically parse chords and display them beautifully in line with lyrics.</li>
+            <li><strong class="text-stone-200">Advanced Chords:</strong> Type complex chords like Cmaj7, Em9, D/F#, or Gsus4. They are generated dynamically!</li>
+            <li><strong class="text-stone-200">Reorder & Export:</strong> Drag and drop your order or export JSON backups.</li>
+          </ul>
+        </div>
+        <div>
+          <h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-lightbulb text-teal-500 mr-2"></i>4. Pro Tips</h4>
+          <ul class="list-disc pl-5 space-y-1">
+            <li><strong class="text-stone-200">Metronome Flash:</strong> Tap the lightning bolt icon in the metronome controls to flash the screen on the downbeat. Great for dark stages!</li>
+            <li><strong class="text-stone-200">Drummer Mode:</strong> Locks down the screen and displays a giant drum icon. Ideal for preventing accidental touches while playing.</li>
+            <li><strong class="text-stone-200">Chord Preview:</strong> Tap any chord block in the UI to hear a synthesized preview of exactly how it sounds.</li>
           </ul>
         </div>
       </div>
-      <div class="p-4 border-t border-stone-800/50 bg-stone-900">
-        <button onclick="closeHelpModal()" class="w-full py-2 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md">Got it!</button>
+    </div>
+  </div>
+
+  <!-- SETLIST MANAGER MODAL -->
+  <div id="setlist-manager-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300">
+    <div id="setlist-manager-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-folder-open mr-2"></i>Setlist Profiles</h3>
+        <button onclick="closeSetlistManager()" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+      <div class="p-4 border-b border-stone-800/50 bg-stone-900 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+        <div class="flex-1">
+           <input type="text" id="new-setlist-name" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm" placeholder="Name (e.g. Wedding Gig)">
+        </div>
+        <button onclick="saveCurrentAsProfile()" class="py-2 px-4 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm whitespace-nowrap">
+          <i class="fa-solid fa-floppy-disk mr-1"></i> Save Current
+        </button>
+      </div>
+      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-2" id="setlist-profiles-container">
+        <!-- Profiles rendered here -->
       </div>
     </div>
   </div>
@@ -103,7 +136,7 @@
           <i class="fa-solid fa-plus mr-1"></i> Add New Song
         </button>
         <button onclick="resetToDefaults()" class="py-2 px-3 bg-stone-800 hover:bg-red-900/80 text-red-400 font-bold rounded-lg transition-colors text-xs border border-red-900/50" title="Restore original 20 songs">
-          <i class="fa-solid fa-rotate-left mr-1"></i> Reset Data
+          <i class="fa-solid fa-rotate-left mr-1"></i> Reset Active Data
         </button>
       </div>
       <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-2" id="manage-list-container">
@@ -172,7 +205,7 @@
               <textarea id="edit-notes" class="w-full h-32 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none" placeholder="Vincent takes intro solo...&#10;Watch out for the drop in Verse 2..."></textarea>
             </div>
             <div class="flex-1 flex flex-col">
-              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics</label>
+              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics (Use [C] tags for ChordPro)</label>
               <textarea id="edit-lyrics" class="w-full h-48 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none" placeholder="Type lyrics here..."></textarea>
             </div>
           </div>
@@ -189,20 +222,22 @@
     <div id="lyrics-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-3xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50 gap-2 sm:gap-4 flex-wrap sm:flex-nowrap">
         <h3 id="lyrics-title" class="text-lg sm:text-2xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md truncate flex-1">Song Lyrics</h3>
-        <div id="autoscroll-container" class="flex items-center gap-2 sm:gap-3 bg-stone-800/50 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 border border-stone-700/50 transition-colors duration-300">
-          <button id="autoscroll-btn" onclick="toggleAutoscroll()" class="text-stone-400 hover:text-teal-400 transition-colors flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider outline-none">
-            <i id="autoscroll-icon" class="fa-solid fa-play"></i>
+        
+        <div id="lyrics-autoscroll-container" class="flex items-center gap-2 sm:gap-3 bg-stone-800/50 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 border border-stone-700/50 transition-colors duration-300">
+          <button id="lyrics-autoscroll-btn" onclick="toggleAutoscroll('lyrics')" class="text-stone-400 hover:text-teal-400 transition-colors flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider outline-none">
+            <i id="lyrics-autoscroll-icon" class="fa-solid fa-play"></i>
             <span class="hidden sm:inline">Scroll</span>
           </button>
           <div class="h-4 w-px bg-stone-500/50"></div>
           <i class="fa-solid fa-gauge-simple text-stone-500 text-[10px]"></i>
-          <input type="range" id="scroll-speed" min="1" max="50" value="10" class="w-16 sm:w-24 accent-teal-500 h-1 bg-stone-700 rounded-none appearance-none cursor-pointer outline-none" title="Adjust Scroll Speed">
+          <input type="range" id="lyrics-scroll-speed" min="1" max="50" value="10" class="w-16 sm:w-24 accent-teal-500 h-1 bg-stone-700 rounded-none appearance-none cursor-pointer outline-none" title="Adjust Scroll Speed">
         </div>
+
         <button onclick="closeLyrics()" class="text-stone-400 hover:text-white text-xl sm:text-2xl w-8 h-8 sm:w-10 sm:h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors flex-shrink-0">
           <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
-      <div id="lyrics-body" class="p-4 sm:p-6 overflow-y-auto flex-1 text-stone-200 text-lg sm:text-2xl whitespace-pre-wrap leading-relaxed tracking-wide pb-12 sm:pb-16">
+      <div id="lyrics-body" class="p-4 sm:p-6 overflow-y-auto flex-1 text-stone-200 text-lg sm:text-2xl whitespace-pre-wrap leading-relaxed tracking-wide pb-12 sm:pb-16 font-sans">
         </div>
     </div>
   </div>
@@ -251,23 +286,34 @@
     </div>
   </div>
 
-  <header class="bg-stone-900/70 border-b border-stone-800 sticky top-0 z-40 backdrop-blur-md px-4 py-2 transition-colors duration-300">
-    <div class="max-w-4xl mx-auto flex items-center justify-between">
-      <div class="flex items-center gap-2">
+  <header class="bg-stone-900/70 border-b border-stone-800 sticky top-0 z-40 backdrop-blur-md px-2 sm:px-4 py-2 transition-colors duration-300">
+    <div class="max-w-4xl mx-auto flex items-center justify-between gap-1 sm:gap-2">
+      <!-- Left: Logo -->
+      <div class="hidden sm:flex items-center gap-2 flex-shrink-0">
         <span class="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.6)]"></span>
-        <h1 class="text-md sm:text-lg font-black tracking-[0.2em] text-teal-500 uppercase drop-shadow-md">Live Setlist</h1>
+        <h1 class="text-sm sm:text-lg font-black tracking-[0.2em] text-teal-500 uppercase drop-shadow-md">Live Setlist</h1>
       </div>
-      <div class="relative flex items-center gap-2">
-        <select id="song-select" class="bg-stone-800/80 border border-stone-700/80 backdrop-blur-sm text-xs sm:text-sm rounded py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 text-stone-200 max-w-[180px] sm:max-w-[260px]"></select>
+      
+      <!-- Middle: Stage Timer -->
+      <div class="flex-none sm:flex-1 flex justify-start sm:justify-center items-center">
+        <div onclick="toggleTimer()" class="cursor-pointer px-2 sm:px-3 py-1 rounded bg-stone-950/40 border border-stone-800/80 hover:bg-stone-900/60 transition-colors shadow-inner flex items-center gap-1.5 sm:gap-2 group" title="Tap to Start/Pause Timer">
+          <i class="fa-solid fa-stopwatch text-stone-500 group-hover:text-teal-400 transition-colors text-[10px] sm:text-xs"></i>
+          <span id="stage-timer-display" class="font-mono text-base sm:text-xl font-black text-stone-400 tracking-wider leading-none transition-colors">45:00</span>
+        </div>
+      </div>
+
+      <!-- Right: Controls -->
+      <div class="relative flex items-center gap-1.5 sm:gap-2 justify-end flex-1 sm:flex-none min-w-0">
+        <select id="song-select" class="bg-stone-800/80 border border-stone-700/80 backdrop-blur-sm text-xs sm:text-sm rounded py-1.5 px-2 sm:px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 text-stone-200 w-full max-w-[150px] sm:max-w-[260px] truncate"></select>
         
-        <button id="settings-toggle" class="p-2 text-stone-300 hover:text-white rounded hover:bg-stone-800/80 transition-colors backdrop-blur-sm" title="Settings">
+        <button id="settings-toggle" class="p-2 text-stone-300 hover:text-white rounded hover:bg-stone-800/80 transition-colors backdrop-blur-sm flex-shrink-0" title="Settings">
           <i class="fa-solid fa-sliders text-base"></i>
         </button>
       </div>
     </div>
   </header>
 
-  <div id="settings-panel" class="hidden bg-stone-900/80 backdrop-blur-md border-b border-stone-800 px-4 py-4 transition-all duration-300">
+  <div id="settings-panel" class="hidden bg-stone-900/80 backdrop-blur-md border-b border-stone-800 px-4 py-4 transition-all duration-300 overflow-y-auto max-h-[80vh]">
     <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
       <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner">
         <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Stage Mode</span>
@@ -280,31 +326,42 @@
         </button>
       </div>
       
+      <!-- REDESIGNED METRONOME SECTION -->
       <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner">
-        <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Rehearsal Metronome</span>
-        <div class="flex items-center gap-3 mb-3">
-          <div class="flex gap-2">
-            <button id="metronome-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md" title="Start/Pause Metronome">
+        <div class="flex justify-between items-center mb-2">
+           <span class="text-xs font-bold text-stone-400 uppercase tracking-widest">Metronome</span>
+           <div class="flex items-center gap-2 bg-stone-900/80 px-2 py-0.5 rounded border border-stone-700/50 shadow-sm">
+             <span id="bpm-display" class="text-xs font-black text-teal-400">120 BPM</span>
+             <div class="w-px h-3 bg-stone-600"></div>
+             <span id="metronome-blinker" class="w-2 h-2 rounded-full bg-stone-800 border border-stone-600 inline-block transition-colors duration-75 shadow-inner"></span>
+           </div>
+        </div>
+        
+        <div class="mb-3">
+          <input type="range" id="bpm-slider" min="50" max="240" value="120" class="w-full accent-teal-500 h-1 bg-stone-800 rounded-none appearance-none cursor-pointer">
+        </div>
+
+        <div class="flex items-center justify-between gap-2 mb-3">
+          <div class="flex gap-1.5 sm:gap-2">
+            <button id="metronome-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md" title="Start/Pause">
               <i class="fa-solid fa-play"></i>
             </button>
-            <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md" title="Mute Clicks (Keep visual flash)">
+            <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md" title="Mute Clicks">
               <i id="mute-icon" class="fa-solid fa-volume-high"></i>
             </button>
             <button id="tap-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-300 flex items-center justify-center transition-colors shadow-md touch-none" title="Tap Tempo">
               <span class="text-[10px] font-black pointer-events-none">TAP</span>
             </button>
           </div>
-          <div class="flex-1">
-            <div class="flex justify-between items-center mb-1">
-              <span id="bpm-display" class="text-xs font-bold text-stone-200">120 BPM</span>
-              <div class="flex items-center gap-2">
-                <button id="flash-toggle-btn" onclick="toggleFlashMode()" class="text-[10px] uppercase font-bold border border-stone-600 text-stone-300 px-2 py-0.5 rounded hover:border-stone-400 transition-all">Flash Off</button>
-                <span id="metronome-blinker" class="w-2 h-2 rounded-full bg-stone-800 border border-stone-700 inline-block transition-colors duration-75"></span>
-              </div>
-            </div>
-            <input type="range" id="bpm-slider" min="50" max="240" value="120" class="w-full accent-teal-500 h-1 bg-stone-800/80 rounded-none appearance-none cursor-pointer">
+          <div class="flex gap-1.5 sm:gap-2 border-l border-stone-700/50 pl-1.5 sm:pl-2">
+            <button onclick="halveTempo()" class="w-8 h-8 rounded bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-400 hover:text-white font-bold text-xs transition-colors shadow-md" title="Half Time">½x</button>
+            <button onclick="doubleTempo()" class="w-8 h-8 rounded bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-400 hover:text-white font-bold text-xs transition-colors shadow-md" title="Double Time">2x</button>
+            <button id="flash-toggle-btn" onclick="toggleFlashMode()" class="w-8 h-8 rounded bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-400 hover:text-white transition-colors shadow-md flex-shrink-0" title="Toggle Screen Flash">
+              <i class="fa-solid fa-bolt"></i>
+            </button>
           </div>
         </div>
+        
         <div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-800/60">
           <div>
             <span class="text-[10px] uppercase font-bold text-stone-400 block mb-1">Time Signature</span>
@@ -320,14 +377,37 @@
         </div>
       </div>
       
+      <!-- Stage Timer Settings -->
+      <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner md:col-span-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div>
+           <span class="text-xs font-bold text-stone-400 block mb-1 uppercase tracking-widest">Stage Timer</span>
+           <p class="text-[10px] text-stone-500">Counts down your set. Turns yellow at 5m, red at 1m.</p>
+        </div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="flex items-center gap-2">
+            <input type="number" id="timer-input-min" value="45" min="1" max="999" class="w-16 bg-stone-900/60 border border-stone-700/80 rounded px-2 py-1.5 text-white text-sm focus:outline-none focus:border-teal-500 font-mono text-center">
+            <span class="text-xs font-bold text-stone-400 uppercase">Min</span>
+          </div>
+          <div class="flex-1 sm:flex-none flex justify-end gap-2">
+            <button onclick="resetTimer()" class="py-1.5 px-3 rounded text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-white font-bold transition-all shadow-md">Reset</button>
+            <button onclick="startStopTimer()" id="timer-toggle-btn" class="py-1.5 px-4 rounded text-xs border border-teal-500/50 bg-stone-800 hover:bg-stone-700 text-teal-400 font-bold transition-all shadow-md flex items-center gap-2 min-w-[100px] justify-center">
+              <i id="timer-toggle-icon" class="fa-solid fa-play"></i> <span id="timer-toggle-text">Start</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner md:col-span-2">
         <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Instruments & Tools</span>
-        <div class="grid grid-cols-2 gap-3 mb-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+          <button onclick="openSetlistManager()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2">
+            <i class="fa-solid fa-folder-open"></i> Profiles
+          </button>
           <button onclick="openReorderModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-list-ol"></i> Reorder Setlist
+            <i class="fa-solid fa-list-ol"></i> Reorder
           </button>
           <button onclick="openManageModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-pen-to-square"></i> Edit Songs
+            <i class="fa-solid fa-pen-to-square"></i> Edit
           </button>
         </div>
         
@@ -339,14 +419,18 @@
           <i class="fa-solid fa-mobile-screen"></i> <span id="wake-lock-text">Keep Screen Awake: OFF</span>
         </button>
         
-        <div class="grid grid-cols-2 gap-3 pt-3 border-t border-stone-800/60">
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-3 pt-3 border-t border-stone-800/60">
           <button onclick="exportSetlist()" class="w-full py-2 px-3 rounded text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-download"></i> Export Data
+            <i class="fa-solid fa-download"></i> Export JSON
           </button>
           <button onclick="document.getElementById('import-file').click()" class="w-full py-2 px-3 rounded text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md flex items-center justify-center gap-2">
-            <i class="fa-solid fa-upload"></i> Import File
+            <i class="fa-solid fa-upload"></i> Import JSON
+          </button>
+          <button onclick="document.getElementById('import-chordpro-file').click()" class="w-full py-2 px-3 rounded text-xs border border-teal-500/50 bg-teal-950/30 hover:bg-teal-900/50 text-teal-400 hover:text-teal-300 font-bold transition-all shadow-md flex items-center justify-center gap-2 col-span-2 md:col-span-1">
+            <i class="fa-solid fa-file-lines"></i> Import ChordPro
           </button>
           <input type="file" id="import-file" class="hidden" accept=".json" onchange="importSetlist(event)">
+          <input type="file" id="import-chordpro-file" class="hidden" accept=".pro,.txt,.crd,.chordpro" onchange="importChordPro(event)">
         </div>
         
         <div class="pt-3 mt-3 border-t border-stone-800/60">
@@ -394,6 +478,12 @@
   </footer>
 
   <script>
+    // --- GLOBAL AUTOSCROLL STATE ---
+    let autoscrollState = {
+        lyrics: { active: false, req: null, accum: 0 },
+        help: { active: false, req: null, accum: 0 }
+    };
+
     let defaultSetlistData = [
       {
         id: "my-first-song",
@@ -401,42 +491,154 @@
         bpm: 120,
         starred: false,
         transition: null,
-        chords: ["G", "C", "D"],
+        chords: ["G", "Cmaj7", "/", "Em9", "D/F#"],
         lines: [
           { text: "Welcome to Live Setlist!", icon: "fa-music" },
-          { text: "Tap the Settings icon to edit this song.", icon: "fa-sliders" },
-          { text: "You can add your own lyrics, chords, and BPM.", icon: "fa-pen-to-square" }
+          { text: "Tap the Settings icon to import a ChordPro file.", icon: "fa-sliders" },
+          { text: "Try the Transpose (+/-) buttons on this slide to see magic!", icon: "fa-guitar" }
         ],
         timeSig: "4/4",
         feel: "1/4",
-        lyrics: `Welcome to your new setlist companion!\n\nTap the settings icon in the top right, go to "Edit Songs", and add your own music.`
+        lyrics: `Welcome to your new setlist companion!\n\nThis song uses [G]ChordPro formatting inside the [Cmaj7]lyrics. If you tap the transpose buttons, the chords [Em9]here will shift [D/F#]automatically!`
       }
     ];
 
     let setlistData = [];
+    let savedSetlistsProfiles = {}; // Object to hold multiple setlist profiles
+    const chromaticScale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
 
-    const chordFrequencies = {
-      "Am": [220.00, 261.63, 329.63],
-      "C": [261.63, 329.63, 392.00],
-      "G": [196.00, 246.94, 293.66],
-      "Bm": [246.94, 293.66, 369.99],
-      "A": [220.00, 277.18, 329.63],
-      "Em": [164.81, 196.00, 246.94],
-      "D": [293.66, 369.99, 440.00],
-      "F": [174.61, 220.00, 261.63],
-      "Dm": [146.83, 220.00, 293.66, 349.23],
-      "E": [164.81, 207.65, 246.94],
-      "Gm": [196.00, 233.08, 293.66],
-      "Cm": [261.63, 311.13, 392.00],
-      "F#m":[185.00, 220.00, 277.18],
-      "B7": [246.94, 311.13, 369.99, 440.00],
-      "C#7":[277.18, 349.23, 415.30, 493.88],
-      "D5add9": [293.66, 440.00, 659.25],
-      "G/B": [246.94, 293.66, 392.00]
-    };
+    // --- TRANSPOSE & DYNAMIC CHORD GENERATOR ---
+    function transposeChord(chord, steps) {
+        if (!chord || chord === '/') return chord;
+        const match = chord.match(/^([A-G][#b]?)(.*)$/i);
+        if (!match) return chord;
+        
+        let root = match[1];
+        let rootUpper = root.charAt(0).toUpperCase() + root.slice(1);
+        let rest = match[2];
+
+        let rootIndex = chromaticScale.findIndex(c => c === rootUpper);
+        if (rootIndex === -1) {
+            const flatsMap = {'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#'};
+            if (flatsMap[rootUpper]) rootIndex = chromaticScale.indexOf(flatsMap[rootUpper]);
+        }
+        if (rootIndex === -1) return chord; 
+
+        let newIndex = (rootIndex + steps) % 12;
+        if (newIndex < 0) newIndex += 12;
+
+        let newRoot = chromaticScale[newIndex];
+
+        if (rest.includes('/')) {
+            let parts = rest.split('/');
+            let transposedBass = transposeChord(parts[1], steps);
+            return newRoot + parts[0] + '/' + transposedBass;
+        }
+
+        return newRoot + rest;
+    }
+
+    function transposeCurrentSong(steps) {
+        const song = setlistData[currentSlideIndex];
+        if (!song) return;
+
+        if (song.chords && song.chords.length > 0) {
+            song.chords = song.chords.map(c => transposeChord(c, steps));
+        }
+
+        if (song.lyrics) {
+            song.lyrics = song.lyrics.replace(/\[([A-G][A-Za-z0-9#\/]*)\]/g, (match, chord) => {
+                return '[' + transposeChord(chord, steps) + ']';
+            });
+        }
+
+        saveCustomSetlist();
+        renderSlide(currentSlideIndex);
+        
+        const lyricsModal = document.getElementById('lyrics-modal');
+        if(!lyricsModal.classList.contains('hidden') && lyricsModal.classList.contains('opacity-100')) {
+            showLyrics(); // refresh open modal
+        }
+        
+        showToast(steps > 0 ? "Transposed +1" : "Transposed -1");
+    }
+
+    function getChordFrequencies(chordName) {
+        if (!chordName || chordName === '/') return null;
+
+        let parts = chordName.split('/');
+        let mainChord = parts[0].trim();
+        let bassNote = parts.length > 1 ? parts[1].trim() : null;
+
+        const regex = /^([A-G][#b]?)(.*)$/i;
+        const match = mainChord.match(regex);
+        if (!match) return null;
+
+        let rootName = match[1];
+        rootName = rootName.charAt(0).toUpperCase() + rootName.slice(1);
+        let quality = match[2];
+
+        const notesMap = {
+            "C": 48, "C#": 49, "Db": 49, "D": 50, "D#": 51, "Eb": 51,
+            "E": 40, "F": 41, "F#": 42, "Gb": 42, "G": 43, "G#": 44, "Ab": 44,
+            "A": 45, "A#": 46, "Bb": 46, "B": 47
+        };
+
+        let rootMidi = notesMap[rootName];
+        if (rootMidi === undefined) return null;
+
+        let intervals = [0, 4, 7]; // Default Major
+        if (quality.match(/m(?!aj)|min|-/i)) intervals[1] = 3; 
+        if (quality.match(/dim|o/i)) { intervals[1] = 3; intervals[2] = 6; } 
+        if (quality.match(/aug|\+/i)) intervals[2] = 8; 
+        if (quality.match(/sus2/i)) intervals[1] = 2; 
+        else if (quality.match(/sus/i)) intervals[1] = 5; 
+        if (quality === "5") intervals = [0, 7, 12]; 
+
+        if (quality.match(/maj7|M7/)) intervals.push(11);
+        else if (quality.match(/dim7/)) intervals.push(9);
+        else if (quality.match(/7/)) intervals.push(10);
+
+        if (quality.match(/6/)) intervals.push(9);
+
+        if (quality.match(/add9/)) intervals.push(14);
+        else if (quality.match(/9/)) {
+            if (!intervals.includes(10) && !intervals.includes(11)) intervals.push(10); 
+            intervals.push(14);
+        }
+        if (quality.match(/11/)) {
+            if (!intervals.includes(10) && !intervals.includes(11)) intervals.push(10);
+            intervals.push(17);
+        }
+
+        if (quality.match(/b5/)) {
+            let idx = intervals.indexOf(7);
+            if(idx !== -1) intervals[idx] = 6;
+        }
+
+        let midiNotes = intervals.map(i => rootMidi + i);
+
+        if (bassNote) {
+            bassNote = bassNote.charAt(0).toUpperCase() + bassNote.slice(1);
+            let bassMidi = notesMap[bassNote];
+            if (bassMidi !== undefined) {
+                while (bassMidi >= rootMidi) bassMidi -= 12;
+                midiNotes.push(bassMidi);
+            }
+        }
+
+        if (midiNotes.length <= 3 && !bassNote) {
+            midiNotes.push(rootMidi + 12);
+        }
+
+        midiNotes = [...new Set(midiNotes)].sort((a,b) => a - b);
+        return midiNotes.map(m => 440 * Math.pow(2, (m - 69) / 12));
+    }
+
 
     // --- DATA LOAD & PERSISTENCE ---
     function loadSetlistData() {
+      // Load current active setlist
       const savedSetlist = localStorage.getItem('pca_custom_setlist_v2');
       if (savedSetlist) {
         try {
@@ -446,10 +648,19 @@
           setlistData = JSON.parse(JSON.stringify(defaultSetlistData));
         }
       } else {
-        // Deep copy default
         setlistData = JSON.parse(JSON.stringify(defaultSetlistData));
       }
       applySavedOrder();
+      
+      // Load profiles
+      const loadedProfiles = localStorage.getItem('pca_setlist_profiles_v2');
+      if (loadedProfiles) {
+        try {
+            savedSetlistsProfiles = JSON.parse(loadedProfiles);
+        } catch(e) {
+            savedSetlistsProfiles = {};
+        }
+      }
     }
 
     function saveCustomSetlist() {
@@ -473,6 +684,100 @@
     function saveSetlistOrder() {
       const order = setlistData.map(song => song.id);
       localStorage.setItem('pca_setlist_order_v2', JSON.stringify(order));
+    }
+
+    // --- SETLIST PROFILES MANAGER LOGIC ---
+    function openSetlistManager() {
+        settingsPanel.classList.add('hidden');
+        renderSetlistProfiles();
+        const modal = document.getElementById('setlist-manager-modal');
+        const content = document.getElementById('setlist-manager-content');
+        modal.classList.remove('hidden');
+        void modal.offsetWidth;
+        modal.classList.remove('opacity-0');
+        modal.classList.add('opacity-100');
+        content.classList.remove('scale-95');
+        content.classList.add('scale-100');
+    }
+
+    function closeSetlistManager() {
+        const modal = document.getElementById('setlist-manager-modal');
+        const content = document.getElementById('setlist-manager-content');
+        modal.classList.remove('opacity-100');
+        modal.classList.add('opacity-0');
+        content.classList.remove('scale-100');
+        content.classList.add('scale-95');
+        setTimeout(() => { modal.classList.add('hidden'); }, 300);
+    }
+
+    function renderSetlistProfiles() {
+        const container = document.getElementById('setlist-profiles-container');
+        container.innerHTML = '';
+        
+        const profileKeys = Object.keys(savedSetlistsProfiles);
+        if (profileKeys.length === 0) {
+            container.innerHTML = `<p class="text-stone-500 text-center py-4 text-sm font-bold">No saved profiles. Save your current setlist above!</p>`;
+            return;
+        }
+
+        profileKeys.forEach(name => {
+            const profile = savedSetlistsProfiles[name];
+            const item = document.createElement('div');
+            item.className = 'flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700';
+            item.innerHTML = `
+              <div class="flex-1 truncate pr-4">
+                <p class="text-white font-bold text-sm sm:text-base truncate">${name}</p>
+                <p class="text-teal-400 text-xs">${profile.length} Songs</p>
+              </div>
+              <div class="flex gap-2">
+                <button onclick="loadProfile('${name.replace(/'/g, "\\'")}')" class="px-3 py-1.5 rounded bg-teal-900/40 hover:bg-teal-800 text-teal-400 border border-teal-700/50 flex items-center justify-center transition-colors text-xs font-bold uppercase tracking-wider">
+                  Load
+                </button>
+                <button onclick="deleteProfile('${name.replace(/'/g, "\\'")}')" class="w-8 h-8 rounded bg-stone-700 hover:bg-red-600/80 text-red-400 hover:text-white flex items-center justify-center transition-colors">
+                  <i class="fa-solid fa-trash"></i>
+                </button>
+              </div>
+            `;
+            container.appendChild(item);
+        });
+    }
+
+    function saveCurrentAsProfile() {
+        const input = document.getElementById('new-setlist-name');
+        const name = input.value.trim();
+        if (!name) {
+            showToast("Enter a name first", true);
+            return;
+        }
+        
+        savedSetlistsProfiles[name] = JSON.parse(JSON.stringify(setlistData)); // Deep copy
+        localStorage.setItem('pca_setlist_profiles_v2', JSON.stringify(savedSetlistsProfiles));
+        
+        input.value = '';
+        renderSetlistProfiles();
+        showToast(`Saved as "${name}"`);
+    }
+
+    function loadProfile(name) {
+        if (confirm(`Load "${name}"? This will overwrite your currently active setlist.`)) {
+            if (savedSetlistsProfiles[name]) {
+                setlistData = JSON.parse(JSON.stringify(savedSetlistsProfiles[name]));
+                saveCustomSetlist(); // Updates active memory
+                populateSelector();
+                renderSlide(0);
+                closeSetlistManager();
+                showToast(`Loaded "${name}"`);
+            }
+        }
+    }
+
+    function deleteProfile(name) {
+        if (confirm(`Delete profile "${name}"?`)) {
+            delete savedSetlistsProfiles[name];
+            localStorage.setItem('pca_setlist_profiles_v2', JSON.stringify(savedSetlistsProfiles));
+            renderSetlistProfiles();
+            showToast("Profile Deleted");
+        }
     }
 
 
@@ -526,9 +831,11 @@
     }
     
     function resetToDefaults() {
-      if(confirm("Are you sure? This will delete any custom songs and restore the original default template.")) {
+      if(confirm("Are you sure? This will delete the currently active setlist and restore the default template. (Saved Profiles will not be deleted)")) {
         localStorage.removeItem('pca_custom_setlist_v2');
         localStorage.removeItem('pca_setlist_order_v2');
+        
+        // Don't wipe the profiles! Just the active list.
         loadSetlistData();
         populateSelector();
         renderSlide(0);
@@ -551,7 +858,7 @@
         item.innerHTML = `
           <div class="flex-1 truncate pr-4">
             <p class="text-white font-bold text-sm sm:text-base truncate">${song.title}</p>
-            <p class="text-teal-400 text-xs">${song.bpm} BPM • ${song.timeSig}</p>
+            <p class="text-teal-400 text-xs">${song.bpm} BPM • ${song.timeSig || '4/4'}</p>
           </div>
           <div class="flex gap-2">
             <button onclick="openEditorModal('${song.id}')" class="w-8 h-8 rounded bg-stone-700 hover:bg-stone-600 text-teal-400 flex items-center justify-center transition-colors">
@@ -599,7 +906,6 @@
           document.getElementById('edit-lyrics').value = song.lyrics || '';
           
           if (song.lines && Array.isArray(song.lines)) {
-            // strip HTML from imported text fields if they have links, just keep text
             document.getElementById('edit-notes').value = song.lines.map(l => l.text.replace(/<[^>]*>?/gm, '')).join('\n');
           }
         }
@@ -638,7 +944,7 @@
       
       const rawNotes = document.getElementById('edit-notes').value;
       const linesArray = rawNotes.split('\n').filter(n => n.trim().length > 0).map(n => {
-        return { text: n.trim(), icon: "fa-circle-dot" }; // Default icon for custom notes
+        return { text: n.trim(), icon: "fa-circle-dot" }; 
       });
 
       const songObj = {
@@ -655,14 +961,11 @@
       };
 
       if (id) {
-        // Update existing
         const index = setlistData.findIndex(s => s.id === id);
         if (index !== -1) {
           setlistData[index] = songObj;
         }
       } else {
-        // Add new
-        // Ensure unique ID
         let newId = songObj.id;
         let counter = 1;
         while(setlistData.some(s => s.id === newId)) {
@@ -677,14 +980,12 @@
       
       populateSelector();
       if(id) {
-        // stay on current if editing current
         renderSlide(currentSlideIndex);
       } else {
-        // Go to newly added slide
         renderSlide(setlistData.length - 1);
       }
       
-      renderManageList(); // update background list
+      renderManageList(); 
       closeEditorModal();
       showToast(id ? "Song Updated" : "Song Added");
     }
@@ -697,7 +998,6 @@
           saveCustomSetlist();
           
           if(setlistData.length === 0) {
-            // Push a default blank if empty
             setlistData.push({
                id: "blank", title: "Empty Setlist", bpm: 120, lines: [], chords: [], lyrics: ""
             });
@@ -766,6 +1066,72 @@
       reader.readAsText(file);
     }
 
+    function importChordPro(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            parseAndAddChordPro(text, file.name);
+            event.target.value = "";
+        };
+        reader.readAsText(file);
+    }
+
+    function parseAndAddChordPro(text, filename) {
+        let title = filename.replace(/\.[^/.]+$/, ""); // Default to filename without ext
+        let bpm = 120;
+        let timeSig = "4/4";
+        let uniqueChords = new Set();
+        let performanceNotes = [];
+
+        // Extract title
+        const titleMatch = text.match(/{(?:title|t):\s*(.*?)}/i);
+        if (titleMatch) title = titleMatch[1].trim();
+
+        // Extract tempo
+        const tempoMatch = text.match(/{(?:tempo|bpm):\s*(\d+)}/i);
+        if (tempoMatch) bpm = parseInt(tempoMatch[1]);
+
+        // Extract notes from {comment: ...} or {c: ...}
+        const commentRegex = /{(?:comment|c):\s*(.*?)}/gi;
+        let commentMatch;
+        while ((commentMatch = commentRegex.exec(text)) !== null) {
+            performanceNotes.push({ text: commentMatch[1], icon: "fa-circle-info" });
+        }
+
+        // Extract chords
+        const chordRegex = /\[([A-G][A-Za-z0-9#\/]*)\]/g;
+        let chordMatch;
+        while ((chordMatch = chordRegex.exec(text)) !== null) {
+            uniqueChords.add(chordMatch[1]);
+        }
+
+        // Clean up lyrics (remove directives but keep [chords] and plain text)
+        let cleanedLyrics = text.replace(/{(?:title|t|subtitle|st|artist|album|tempo|bpm|comment|c):\s*.*?}/gi, '');
+
+        const songObj = {
+            id: title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + '-' + Date.now(),
+            title: title,
+            bpm: bpm,
+            timeSig: timeSig,
+            feel: "1/4",
+            starred: false,
+            transition: null,
+            chords: Array.from(uniqueChords),
+            lines: performanceNotes,
+            lyrics: cleanedLyrics.trim()
+        };
+
+        setlistData.push(songObj);
+        saveCustomSetlist();
+        populateSelector();
+        renderSlide(setlistData.length - 1);
+        showToast("ChordPro Imported!");
+        document.getElementById('settings-panel').classList.add('hidden');
+    }
+
     // --- CORE APP VARIABLES ---
     let currentSlideIndex = 0, currentTheme = 'dark';
     let touchStartX = 0, touchEndX = 0;
@@ -774,8 +1140,13 @@
     let metronomeContext = null, timerID = null;
     let nextNoteTime = 0.0, currentSubdivision = 0;
     const lookahead = 25.0, scheduleAheadTime = 0.1;
-    let isAutoscrolling = false, scrollReq = null, scrollAccumulator = 0;
     let isDrummerMode = false;
+
+    // --- STAGE TIMER VARIABLES ---
+    let stageTimerInterval = null;
+    let timerRemainingSeconds = 45 * 60; 
+    let isStageTimerRunning = false;
+    let timerTargetTime = 0;
 
     // DOM Elements
     const slideContainer = document.getElementById('slide-container'),
@@ -802,7 +1173,7 @@
           drummerOverlay = document.getElementById('drummer-mode-overlay');
 
     window.onload = function() {
-      loadSetlistData(); // Loads localstorage or defaults
+      loadSetlistData(); 
       populateSelector();
       updateFeelSelectOptions();
       renderSlide(0);
@@ -811,6 +1182,11 @@
       initMetronomeControls();
       setupAutoscrollListeners();
       checkWakeLockSupport();
+      resetTimer(); 
+
+      document.getElementById('timer-input-min').addEventListener('change', () => {
+          if (!isStageTimerRunning) resetTimer();
+      });
     };
 
     function populateSelector() {
@@ -834,6 +1210,91 @@
     settingsToggle.addEventListener('click', () => {
       settingsPanel.classList.toggle('hidden');
     });
+
+
+    // --- STAGE TIMER LOGIC ---
+    function formatTime(totalSeconds) {
+      const isNegative = totalSeconds < 0;
+      const absSeconds = Math.abs(totalSeconds);
+      const minutes = Math.floor(absSeconds / 60);
+      const seconds = absSeconds % 60;
+      return `${isNegative ? '-' : ''}${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+    }
+
+    function updateTimerUI() {
+      const display = document.getElementById('stage-timer-display');
+      if (!display) return;
+      
+      display.textContent = formatTime(timerRemainingSeconds);
+      display.classList.remove('text-stone-400', 'text-stone-500', 'text-teal-400', 'text-teal-600', 'text-yellow-400', 'text-amber-500', 'text-red-500', 'text-red-600');
+      
+      if (timerRemainingSeconds <= 60) {
+        display.classList.add(currentTheme === 'dark' ? 'text-red-500' : 'text-red-600', 'animate-pulse');
+      } else if (timerRemainingSeconds <= 300) {
+        display.classList.add(currentTheme === 'dark' ? 'text-yellow-400' : 'text-amber-500');
+        display.classList.remove('animate-pulse');
+      } else if (isStageTimerRunning) {
+        display.classList.add(currentTheme === 'dark' ? 'text-teal-400' : 'text-teal-600');
+        display.classList.remove('animate-pulse');
+      } else {
+        display.classList.add(currentTheme === 'dark' ? 'text-stone-400' : 'text-stone-500');
+        display.classList.remove('animate-pulse');
+      }
+    }
+
+    function startStopTimer() {
+      const toggleIcon = document.getElementById('timer-toggle-icon');
+      const toggleText = document.getElementById('timer-toggle-text');
+      const toggleBtn = document.getElementById('timer-toggle-btn');
+      
+      if (isStageTimerRunning) {
+        clearInterval(stageTimerInterval);
+        isStageTimerRunning = false;
+        
+        if(toggleText) toggleText.textContent = 'Resume';
+        if(toggleIcon) toggleIcon.className = 'fa-solid fa-play';
+        if(toggleBtn) {
+            toggleBtn.classList.replace('text-red-400', 'text-teal-400');
+            toggleBtn.classList.replace('border-red-500/50', 'border-teal-500/50');
+        }
+      } else {
+        timerTargetTime = Date.now() + (timerRemainingSeconds * 1000);
+        stageTimerInterval = setInterval(() => {
+          timerRemainingSeconds = Math.ceil((timerTargetTime - Date.now()) / 1000);
+          updateTimerUI();
+        }, 250); 
+        isStageTimerRunning = true;
+        
+        if(toggleText) toggleText.textContent = 'Pause';
+        if(toggleIcon) toggleIcon.className = 'fa-solid fa-pause';
+        if(toggleBtn) {
+            toggleBtn.classList.replace('text-teal-400', 'text-red-400');
+            toggleBtn.classList.replace('border-teal-500/50', 'border-red-500/50');
+        }
+      }
+      updateTimerUI();
+    }
+
+    function resetTimer() {
+      const minInput = document.getElementById('timer-input-min');
+      let mins = minInput ? parseInt(minInput.value) : 45;
+      if (isNaN(mins) || mins < 0) mins = 45; 
+      
+      if (isStageTimerRunning) {
+        startStopTimer(); 
+      }
+      
+      timerRemainingSeconds = mins * 60;
+      updateTimerUI();
+      
+      const toggleText = document.getElementById('timer-toggle-text');
+      if(toggleText) toggleText.textContent = 'Start';
+    }
+
+    function toggleTimer() {
+        startStopTimer();
+    }
+
 
     // --- REORDER LOGIC ---
     let draggedReorderIndex = null;
@@ -880,7 +1341,7 @@
           if (draggedReorderIndex !== null && draggedReorderIndex !== index) {
             const draggedSong = setlistData.splice(draggedReorderIndex, 1)[0];
             setlistData.splice(index, 0, draggedSong);
-            saveCustomSetlist(); // Persist reorder
+            saveCustomSetlist(); 
             renderReorderList();
             populateSelector();
             renderSlide(currentSlideIndex); 
@@ -938,15 +1399,20 @@
       settingsPanel.classList.add('hidden');
       const modal = document.getElementById('help-modal');
       const content = document.getElementById('help-modal-content');
+      document.getElementById('help-body').scrollTop = 0;
+      
       modal.classList.remove('hidden');
       void modal.offsetWidth;
       modal.classList.remove('opacity-0');
       modal.classList.add('opacity-100');
       content.classList.remove('scale-95');
       content.classList.add('scale-100');
+      
+      startHelpAutoscroll();
     }
 
     function closeHelpModal() {
+      stopHelpAutoscroll();
       const modal = document.getElementById('help-modal');
       const content = document.getElementById('help-modal-content');
       modal.classList.remove('opacity-100');
@@ -1185,32 +1651,29 @@
       if (!metronomeContext) metronomeContext = new (window.AudioContext || window.webkitAudioContext)();
       if (metronomeContext.state === 'suspended') metronomeContext.resume();
       
-      const freqs = chordFrequencies[chordName];
+      const freqs = getChordFrequencies(chordName);
       if (!freqs) return;
       
       const now = metronomeContext.currentTime;
       freqs.forEach((freq, idx) => {
         const osc = metronomeContext.createOscillator();
         const gain = metronomeContext.createGain();
-        const filter = metronomeContext.createBiquadFilter(); // Envelope filter for guitar tone
+        const filter = metronomeContext.createBiquadFilter(); 
         
         osc.connect(filter); 
         filter.connect(gain); 
         gain.connect(metronomeContext.destination);
         
-        osc.type = 'sawtooth'; // Richer harmonics 
+        osc.type = 'sawtooth'; 
         osc.frequency.setValueAtTime(freq, now);
         
-        // Lengthened strum delay so strings pop individually
         const delay = idx * 0.045; 
         
-        // Filter envelope (starts bright, snaps closed quickly to mimic a string pluck)
         filter.type = 'lowpass';
         filter.Q.value = 1;
         filter.frequency.setValueAtTime(4000, now + delay);
         filter.frequency.exponentialRampToValueAtTime(400, now + delay + 0.3);
         
-        // Volume envelope (sharp attack, long warm ring)
         gain.gain.setValueAtTime(0, now + delay);
         gain.gain.linearRampToValueAtTime(0.15, now + delay + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 2.5);
@@ -1279,12 +1742,21 @@
       if (song.chords && song.chords.length > 0) {
         contentHtml += ` <div class="relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 border-stone-700/50 bg-cover bg-center shadow-lg" style="background-image: url('https://images.unsplash.com/photo-1598387181032-a310322a51f3?auto=format&fit=crop&q=80&w=2000');">
           <div class="absolute inset-0 bg-stone-950/80 z-0"></div>
-          <div class="relative z-10 flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2.5">
-            <span class="text-[10px] sm:text-xs md:text-sm uppercase font-black text-teal-400 w-full mb-0.5 sm:mb-1 block tracking-widest drop-shadow-md">Chords (Tap to play):</span>
+          <div class="relative z-10 flex flex-col gap-2.5">
+            <div class="flex justify-between items-center w-full border-b border-stone-700/50 pb-2">
+                <span class="text-[10px] sm:text-xs md:text-sm uppercase font-black text-teal-400 tracking-widest drop-shadow-md">Chords (Tap to play):</span>
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] text-stone-400 uppercase font-bold tracking-wider hidden sm:block">Transpose</span>
+                    <button onclick="transposeCurrentSong(-1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:bg-stone-700 hover:text-white flex items-center justify-center font-bold shadow-md transition-colors"><i class="fa-solid fa-minus text-xs"></i></button>
+                    <button onclick="transposeCurrentSong(1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:bg-stone-700 hover:text-white flex items-center justify-center font-bold shadow-md transition-colors"><i class="fa-solid fa-plus text-xs"></i></button>
+                </div>
+            </div>
+            <div class="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2.5">
             ${song.chords.map(chord => {
               if(chord === '/') return `<div class="w-full h-0.5 my-0 block"></div>`;
               return `<button onclick="playChord('${chord}')" class="bg-stone-950/90 hover:bg-stone-900 border-2 border-stone-600/80 text-teal-300 hover:text-teal-100 active:scale-95 font-black px-3 py-1.5 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg text-xl sm:text-3xl lg:text-4xl tracking-wider shadow-xl transition-all backdrop-blur-md leading-none">${chord}</button>`;
             }).join('')}
+            </div>
           </div>
         </div>`;
       }
@@ -1301,45 +1773,97 @@
       applyThemeStyles();
     }
 
-    // --- LYRICS & AUTOSCROLL ---
+    // --- LYRICS & MANUAL AUTOSCROLL ---
     function setupAutoscrollListeners() {
       const lyricsBody = document.getElementById('lyrics-body');
-      const pauseScroll = () => { if (isAutoscrolling) toggleAutoscroll(); };
-      lyricsBody.addEventListener('touchstart', pauseScroll, {passive: true});
-      lyricsBody.addEventListener('mousedown', pauseScroll);
-      lyricsBody.addEventListener('wheel', pauseScroll, {passive: true});
-    }
-
-    function autoscrollStep() {
-      if (!isAutoscrolling) return;
-      const lyricsBody = document.getElementById('lyrics-body');
-      const speed = parseFloat(document.getElementById('scroll-speed').value) * 0.02;
+      const helpBody = document.getElementById('help-body');
       
-      scrollAccumulator += speed;
-      if (scrollAccumulator >= 1) {
-        const step = Math.floor(scrollAccumulator);
-        lyricsBody.scrollTop += step;
-        scrollAccumulator -= step;
+      const pauseLyricsScroll = () => { if (autoscrollState.lyrics.active) toggleAutoscroll('lyrics'); };
+      const pauseHelpScroll = () => { stopHelpAutoscroll(); };
+
+      if (lyricsBody) {
+          lyricsBody.addEventListener('touchstart', pauseLyricsScroll, {passive: true});
+          lyricsBody.addEventListener('mousedown', pauseLyricsScroll);
+          lyricsBody.addEventListener('wheel', pauseLyricsScroll, {passive: true});
       }
       
-      if (Math.ceil(lyricsBody.scrollTop + lyricsBody.clientHeight) >= lyricsBody.scrollHeight - 2) toggleAutoscroll();
-      else scrollReq = requestAnimationFrame(autoscrollStep);
+      if (helpBody) {
+          helpBody.addEventListener('touchstart', pauseHelpScroll, {passive: true});
+          helpBody.addEventListener('mousedown', pauseHelpScroll);
+          helpBody.addEventListener('wheel', pauseHelpScroll, {passive: true});
+      }
     }
 
-    function toggleAutoscroll() {
-      isAutoscrolling = !isAutoscrolling;
-      const btnIcon = document.getElementById('autoscroll-icon'), btn = document.getElementById('autoscroll-btn');
+    function startHelpAutoscroll() {
+      autoscrollState.help.active = true;
+      autoscrollState.help.accum = 0;
+      if (autoscrollState.help.req) cancelAnimationFrame(autoscrollState.help.req);
       
-      if (isAutoscrolling) {
-        btnIcon.className = "fa-solid fa-pause";
-        btn.classList.add('text-teal-400'); btn.classList.remove('text-stone-400');
-        scrollAccumulator = 0;
-        if (scrollReq) cancelAnimationFrame(scrollReq);
-        scrollReq = requestAnimationFrame(autoscrollStep);
+      const step = () => {
+          if (!autoscrollState.help.active) return;
+          const speed = 0.25; // gentle, fixed slow speed
+          autoscrollState.help.accum += speed;
+          const container = document.getElementById('help-body');
+          
+          if (autoscrollState.help.accum >= 1) {
+              const s = Math.floor(autoscrollState.help.accum);
+              container.scrollTop += s;
+              autoscrollState.help.accum -= s;
+          }
+          
+          if (Math.ceil(container.scrollTop + container.clientHeight) >= container.scrollHeight - 2) {
+              stopHelpAutoscroll(); // stop at bottom
+          } else {
+              autoscrollState.help.req = requestAnimationFrame(step);
+          }
+      };
+      // Wait 1 second before starting so the user can read the title first
+      setTimeout(() => { if(autoscrollState.help.active) autoscrollState.help.req = requestAnimationFrame(step); }, 1000);
+    }
+
+    function stopHelpAutoscroll() {
+      autoscrollState.help.active = false;
+      if (autoscrollState.help.req) {
+          cancelAnimationFrame(autoscrollState.help.req);
+          autoscrollState.help.req = null;
+      }
+    }
+
+    function toggleAutoscroll(type) {
+      let state = autoscrollState[type];
+      state.active = !state.active;
+      
+      const btnIcon = document.getElementById(`${type}-autoscroll-icon`);
+      const btn = document.getElementById(`${type}-autoscroll-btn`);
+      const container = document.getElementById(`${type}-body`);
+      const speedInput = document.getElementById(`${type}-scroll-speed`);
+
+      if (state.active) {
+          btnIcon.className = "fa-solid fa-pause";
+          btn.classList.add('text-teal-400'); btn.classList.remove('text-stone-400');
+          state.accum = 0;
+          if (state.req) cancelAnimationFrame(state.req);
+          
+          const step = () => {
+              if (!state.active) return;
+              const speed = parseFloat(speedInput.value) * 0.02;
+              state.accum += speed;
+              if (state.accum >= 1) {
+                  const s = Math.floor(state.accum);
+                  container.scrollTop += s;
+                  state.accum -= s;
+              }
+              if (Math.ceil(container.scrollTop + container.clientHeight) >= container.scrollHeight - 2) {
+                  toggleAutoscroll(type); 
+              } else {
+                  state.req = requestAnimationFrame(step);
+              }
+          };
+          state.req = requestAnimationFrame(step);
       } else {
-        btnIcon.className = "fa-solid fa-play";
-        btn.classList.remove('text-teal-400'); btn.classList.add('text-stone-400');
-        if (scrollReq) { cancelAnimationFrame(scrollReq); scrollReq = null; }
+          btnIcon.className = "fa-solid fa-play";
+          btn.classList.remove('text-teal-400'); btn.classList.add('text-stone-400');
+          if (state.req) { cancelAnimationFrame(state.req); state.req = null; }
       }
     }
 
@@ -1347,20 +1871,32 @@
       const song = setlistData[currentSlideIndex];
       document.getElementById('lyrics-title').textContent = song.title + " - Lyrics";
       const lyricsBody = document.getElementById('lyrics-body');
-      lyricsBody.textContent = song.lyrics || "Lyrics not added yet.";
-      lyricsBody.scrollTop = 0;
-      if (isAutoscrolling) toggleAutoscroll();
+      
+      let rawLyrics = song.lyrics || "Lyrics not added yet.";
+      
+      let formattedLyrics = rawLyrics
+        .replace(/</g, "&lt;").replace(/>/g, "&gt;") 
+        .replace(/\[([A-G][A-Za-z0-9#\/]*)\]/g, '<strong class="text-teal-300 bg-teal-950/50 px-1.5 py-0.5 rounded mx-0.5 border border-teal-700/50 font-mono text-[0.7em] shadow-sm tracking-tighter align-super leading-[0]">[$1]</strong>');
+        
+      lyricsBody.innerHTML = formattedLyrics;
       
       const modal = document.getElementById('lyrics-modal');
-      const content = document.getElementById('lyrics-modal-content');
+      if (modal.classList.contains('hidden')) {
+          lyricsBody.scrollTop = 0;
+      }
+      
+      if (autoscrollState.lyrics.active && modal.classList.contains('hidden')) toggleAutoscroll('lyrics');
+      
       modal.classList.remove('hidden');
       void modal.offsetWidth;
       modal.classList.remove('opacity-0'); modal.classList.add('opacity-100');
+      
+      const content = document.getElementById('lyrics-modal-content');
       content.classList.remove('scale-95'); content.classList.add('scale-100');
     }
 
     function closeLyrics() {
-      if (isAutoscrolling) toggleAutoscroll();
+      if (autoscrollState.lyrics.active) toggleAutoscroll('lyrics');
       const modal = document.getElementById('lyrics-modal');
       const content = document.getElementById('lyrics-modal-content');
       modal.classList.remove('opacity-100'); modal.classList.add('opacity-0');
@@ -1411,15 +1947,16 @@
         darkBtn.className = "py-1 px-3 rounded text-xs border border-stone-400/80 text-stone-500 hover:border-stone-600 font-bold transition-all";
       }
       applyThemeStyles();
+      updateTimerUI(); 
     }
 
     function applyThemeStyles() {
       const cards = [slideContainer, settingsPanel];
       const titles = document.querySelectorAll('h2');
       const listIcons = document.querySelectorAll('li span.flex-shrink-0');
-      const modals = ['lyrics-modal-content', 'reorder-modal-content', 'tuner-modal-content', 'help-modal-content', 'manage-modal-content', 'editor-modal-content'].map(id => document.getElementById(id));
-      const lyricsBody = document.getElementById('lyrics-body');
-      const autoscrollContainer = document.getElementById('autoscroll-container');
+      const modals = ['lyrics-modal-content', 'reorder-modal-content', 'tuner-modal-content', 'help-modal-content', 'manage-modal-content', 'editor-modal-content', 'setlist-manager-content'].map(id => document.getElementById(id));
+      const textBodies = [document.getElementById('lyrics-body'), document.getElementById('help-body')];
+      const autoscrollContainers = [document.getElementById('lyrics-autoscroll-container')];
       
       if (currentTheme === 'dark') {
         cards.forEach(c => { c.classList.remove('bg-white/80', 'border-stone-300'); c.classList.add('bg-stone-900/80', 'border-stone-800/50'); });
@@ -1427,16 +1964,16 @@
         listIcons.forEach(i => { i.classList.remove('bg-stone-200/80', 'border-stone-300', 'text-stone-700'); i.classList.add('bg-stone-900/60', 'border-stone-700/50', 'text-teal-400'); });
         document.body.classList.remove('text-stone-900'); document.body.classList.add('text-stone-200');
         modals.forEach(m => { if(m) { m.classList.remove('bg-white', 'border-stone-300'); m.classList.add('bg-stone-900', 'border-stone-700'); } });
-        if(lyricsBody) { lyricsBody.classList.remove('text-stone-800'); lyricsBody.classList.add('text-stone-200'); }
-        if(autoscrollContainer) { autoscrollContainer.classList.remove('bg-stone-200', 'border-stone-300'); autoscrollContainer.classList.add('bg-stone-800/50', 'border-stone-700/50'); }
+        textBodies.forEach(b => { if(b) { b.classList.remove('text-stone-800'); b.classList.add('text-stone-200'); } });
+        autoscrollContainers.forEach(c => { if(c) { c.classList.remove('bg-stone-200', 'border-stone-300'); c.classList.add('bg-stone-800/50', 'border-stone-700/50'); } });
       } else {
         cards.forEach(c => { c.classList.remove('bg-stone-900/80', 'border-stone-800/50'); c.classList.add('bg-white/80', 'border-stone-300'); });
         titles.forEach(t => t.classList.remove('text-white'));
         listIcons.forEach(i => { i.classList.remove('bg-stone-900/60', 'border-stone-700/50', 'text-teal-400'); i.classList.add('bg-stone-200/80', 'border-stone-300', 'text-stone-700'); });
         document.body.classList.remove('text-stone-200'); document.body.classList.add('text-stone-900');
         modals.forEach(m => { if(m) { m.classList.remove('bg-stone-900', 'border-stone-700'); m.classList.add('bg-white', 'border-stone-300'); } });
-        if(lyricsBody) { lyricsBody.classList.remove('text-stone-200'); lyricsBody.classList.add('text-stone-800'); }
-        if(autoscrollContainer) { autoscrollContainer.classList.remove('bg-stone-800/50', 'border-stone-700/50'); autoscrollContainer.classList.add('bg-stone-200', 'border-stone-300'); }
+        textBodies.forEach(b => { if(b) { b.classList.remove('text-stone-200'); b.classList.add('text-stone-800'); } });
+        autoscrollContainers.forEach(c => { if(c) { c.classList.remove('bg-stone-800/50', 'border-stone-700/50'); c.classList.add('bg-stone-200', 'border-stone-300'); } });
       }
     }
 
@@ -1453,12 +1990,11 @@
 
     function toggleFlashMode() {
       isFlashModeEnabled = !isFlashModeEnabled;
+      const btn = document.getElementById('flash-toggle-btn');
       if (isFlashModeEnabled) {
-        flashToggleBtn.className = "text-[10px] uppercase font-bold border border-emerald-500 text-emerald-400 px-2 py-0.5 rounded bg-emerald-950/20 transition-all shadow-sm";
-        flashToggleBtn.textContent = " Flash On";
+        btn.className = "w-8 h-8 rounded bg-stone-700 border border-emerald-500/50 text-emerald-400 transition-colors shadow-[0_0_8px_rgba(16,185,129,0.3)] flex-shrink-0";
       } else {
-        flashToggleBtn.className = "text-[10px] uppercase font-bold border border-stone-600 text-stone-300 px-2 py-0.5 rounded hover:border-stone-400 transition-all";
-        flashToggleBtn.textContent = " Flash Off";
+        btn.className = "w-8 h-8 rounded bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-400 hover:text-white transition-colors shadow-md flex-shrink-0";
       }
     }
 
@@ -1543,7 +2079,21 @@
       metronomeBtn.innerHTML = '<i class="fa-solid fa-play"></i>';
       metronomeBtn.classList.remove('text-red-500'); metronomeBtn.classList.add('text-teal-500');
       clearTimeout(timerID);
-      blinker.className = "w-2 h-2 rounded-full bg-stone-800 inline-block transition-colors duration-75";
+      blinker.className = "w-2 h-2 rounded-full bg-stone-800 inline-block transition-colors duration-75 shadow-inner";
+    }
+
+    function halveTempo() {
+      metronomeBpm = Math.max(50, Math.round(metronomeBpm / 2));
+      bpmDisplay.textContent = `${metronomeBpm} BPM`;
+      bpmSlider.value = metronomeBpm;
+      if (isMetronomeRunning) { stopMetronome(); startMetronome(); }
+    }
+
+    function doubleTempo() {
+      metronomeBpm = Math.min(240, Math.round(metronomeBpm * 2));
+      bpmDisplay.textContent = `${metronomeBpm} BPM`;
+      bpmSlider.value = metronomeBpm;
+      if (isMetronomeRunning) { stopMetronome(); startMetronome(); }
     }
 
     // --- TAP TEMPO LOGIC ---
@@ -1591,3 +2141,7 @@
   </script>
 </body>
 </html>
+
+
+
+
