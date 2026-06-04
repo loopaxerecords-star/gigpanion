@@ -1,10 +1,11 @@
-const CACHE_NAME = 'gigpanion-cache-v1';
+const CACHE_NAME = 'gigpanion-cache-v2';
 
 // Files to cache for offline use
 const urlsToCache = [
   './',
   './index.html',
-  './manifest.json'
+  './manifest.json',
+  './speed-insights-init.js'
 ];
 
 // Install Event: Cache the core files
