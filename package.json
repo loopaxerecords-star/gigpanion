@@ -1,0 +1,17 @@
+{
+  "name": "gigpanion",
+  "version": "1.0.0",
+  "description": "Band Setlist & Rehearsal Companion",
+  "type": "module",
+  "scripts": {
+    "build": "echo 'No build step required for static site'",
+    "dev": "npx serve .",
+    "lint": "echo 'No linter configured'"
+  },
+  "keywords": ["music", "setlist", "band", "rehearsal"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@vercel/speed-insights": "^1.0.15"
+  }
+}
