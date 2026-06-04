@@ -1190,16 +1190,33 @@
       
       const now = metronomeContext.currentTime;
       freqs.forEach((freq, idx) => {
-        const osc = metronomeContext.createOscillator(), gain = metronomeContext.createGain();
-        osc.connect(gain); gain.connect(metronomeContext.destination);
-        osc.type = 'triangle'; osc.frequency.setValueAtTime(freq, now);
+        const osc = metronomeContext.createOscillator();
+        const gain = metronomeContext.createGain();
+        const filter = metronomeContext.createBiquadFilter(); // Envelope filter for guitar tone
         
-        const delay = idx * 0.03;
+        osc.connect(filter); 
+        filter.connect(gain); 
+        gain.connect(metronomeContext.destination);
+        
+        osc.type = 'sawtooth'; // Richer harmonics 
+        osc.frequency.setValueAtTime(freq, now);
+        
+        // Lengthened strum delay so strings pop individually
+        const delay = idx * 0.045; 
+        
+        // Filter envelope (starts bright, snaps closed quickly to mimic a string pluck)
+        filter.type = 'lowpass';
+        filter.Q.value = 1;
+        filter.frequency.setValueAtTime(4000, now + delay);
+        filter.frequency.exponentialRampToValueAtTime(400, now + delay + 0.3);
+        
+        // Volume envelope (sharp attack, long warm ring)
         gain.gain.setValueAtTime(0, now + delay);
-        gain.gain.linearRampToValueAtTime(0.12, now + delay + 0.05);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 1.2);
+        gain.gain.linearRampToValueAtTime(0.15, now + delay + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 2.5);
         
-        osc.start(now + delay); osc.stop(now + delay + 1.3);
+        osc.start(now + delay); 
+        osc.stop(now + delay + 2.6);
       });
     }
 
