@@ -17,6 +17,12 @@
     import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
     window.firebaseModules = { initializeApp, getFirestore, doc, setDoc, onSnapshot };
   </script>
+  
+  <!-- Vercel Web Analytics -->
+  <script>
+    window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+  </script>
+  <script defer src="/_vercel/insights/script.js"></script>
 
   <style>
     .slide-enter-right { animation: slideInRight 0.25s ease-out forwards; }
