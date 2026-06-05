@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -121,6 +121,7 @@
       </div>
       <div class="p-4 border-b border-stone-800/50 bg-stone-900 flex justify-between items-center gap-4">
         <button onclick="openEditorModal()" class="flex-1 py-2 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm"><i class="fa-solid fa-plus mr-1"></i> Add New Song</button>
+        <button onclick="clearSetlist()" class="flex-1 py-2 bg-red-600 hover:bg-red-500 text-white font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm"><i class="fa-solid fa-trash mr-1"></i> Clear Setlist</button>
       </div>
       <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-2" id="manage-list-container"></div>
     </div>
@@ -541,6 +542,18 @@
     function closeModal(id) {
         const m = document.getElementById(`${id}-modal`), c = document.getElementById(`${id}-modal-content`);
         m.classList.replace('opacity-100', 'opacity-0'); c.classList.replace('scale-100', 'scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
+    }
+
+    // --- CLEAR SETLIST ---
+    function clearSetlist() {
+      if (confirm("Are you sure you want to clear the entire setlist? This cannot be undone.")) {
+        setlistData = [];
+        saveCustomSetlist();
+        populateSelector();
+        renderSlide(0);
+        renderManageList();
+        showToast("Setlist cleared", true);
+      }
     }
 
     // --- VAULT & HISTORY LOGIC ---
@@ -1028,4 +1041,4 @@
 </html>
 
 
-
+```
