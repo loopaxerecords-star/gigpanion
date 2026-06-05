@@ -7,17 +7,9 @@
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#14b8a6">
 
-  <title>Gigpanion Live Rig</title>
+  <title>Gigpanion Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Firebase SDK (Vir Cloud Sync as jy aanlyn is) -->
-  <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
-    import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
-    window.firebaseModules = { initializeApp, getFirestore, doc, setDoc, onSnapshot };
-  </script>
-
   <style>
     .slide-enter-right { animation: slideInRight 0.25s ease-out forwards; }
     .slide-enter-left { animation: slideInLeft 0.25s ease-out forwards; }
@@ -37,7 +29,12 @@
     .chordpro-line { min-height: 2.5em; position: relative; margin-bottom: 0.5rem; display: flex; flex-wrap: wrap; align-items: flex-end; }
     .chord-badge { position: absolute; top: -1.2em; font-weight: 900; font-size: 0.75em; color: #2dd4bf; background: rgba(28, 25, 23, 0.95); padding: 0.1em 0.3em; border-radius: 0.25rem; border: 1px solid rgba(68, 64, 60, 0.8); box-shadow: 0 2px 4px rgba(0,0,0,0.3); }
 
-    /* Print Styles vir PDF Export */
+    /* Festival Mode Overrides */
+    .theme-festival { background: #ffffff !important; color: #000000 !important; }
+    .theme-festival * { text-shadow: none !important; box-shadow: none !important; }
+    .theme-festival .chord-badge { background: #fff !important; color: #000 !important; border: 2px solid #000 !important; font-weight: 900 !important; }
+    
+    /* PDF Print Styles */
     @media print {
       body * { visibility: hidden; }
       #print-area, #print-area * { visibility: visible; }
@@ -59,7 +56,6 @@
   
   <div id="stage-flash-overlay" class="print:hidden"></div>
   
-  <!-- Drummer Mode -->
   <div id="drummer-mode-overlay" onclick="toggleDrummerMode()" class="fixed inset-0 bg-black z-[9990] opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center flex-col cursor-pointer print:hidden">
     <i class="fa-solid fa-drum text-stone-900 text-[8rem] mb-6"></i>
     <p class="text-stone-800 font-black uppercase tracking-[0.3em] text-lg sm:text-xl">Tap anywhere to exit</p>
@@ -67,12 +63,54 @@
 
   <div id="toast-notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-[10050] font-black tracking-widest text-xs uppercase flex items-center gap-2 print:hidden"></div>
 
-  <!-- Manage Songs Modal -->
+  <div id="help-modal" class="fixed inset-0 bg-black/90 z-[10015] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="help-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-book-open mr-2"></i>App Manual</h3>
+        <button onclick="closeModal('help')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 text-stone-300 space-y-6">
+        <div><h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-bolt text-teal-500 mr-2"></i>Bluetooth Pedal</h4><ul class="list-disc pl-5 text-sm space-y-1"><li><strong class="text-stone-200">Next/Prev:</strong> PageDown/PageUp keys step through the setlist.</li><li><strong class="text-stone-200">Lyrics & Scroll:</strong> Spacebar opens lyrics and auto-starts scrolling!</li></ul></div>
+        <div><h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-cloud text-teal-500 mr-2"></i>Live Sync</h4><ul class="list-disc pl-5 text-sm space-y-1"><li><strong class="text-stone-200">Master/Slave:</strong> Set one device as Master. Others set as Slave will automatically change songs when the Master does!</li></ul></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="vault-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="vault-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-layer-group mr-2"></i>Song Vault & Gig Builder</h3>
+        <button onclick="closeModal('vault')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-4 border-b border-stone-800/50 bg-stone-900 flex flex-wrap gap-4 items-center">
+         <div class="flex items-center gap-2">
+            <input type="number" id="auto-min" value="45" class="w-16 bg-stone-800 border border-stone-700 rounded p-1.5 text-white text-center focus:outline-none focus:border-teal-500 font-mono text-sm">
+            <span class="text-xs font-bold text-stone-400 uppercase">Mins</span>
+         </div>
+         <button onclick="autoGenerateSetlist()" class="py-2 px-4 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Smart Generate Set</button>
+         <button onclick="saveGigToHistory()" class="py-2 px-4 bg-stone-800 hover:bg-stone-700 text-stone-300 font-bold uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm border border-stone-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Save to History</button>
+      </div>
+      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 flex flex-col gap-4" id="vault-list-container">
+         </div>
+    </div>
+  </div>
+
+  <div id="history-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="history-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Gig History</h3>
+        <button onclick="closeModal('history')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 space-y-4" id="history-list-container">
+      </div>
+    </div>
+  </div>
+
   <div id="manage-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="manage-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-3xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
         <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-pen-to-square mr-2"></i>Manage Songs</h3>
-        <button onclick="closeManageModal()" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeModal('manage')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-4 border-b border-stone-800/50 bg-stone-900 flex justify-between items-center gap-4">
         <button onclick="openEditorModal()" class="flex-1 py-2 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm"><i class="fa-solid fa-plus mr-1"></i> Add New Song</button>
@@ -81,80 +119,93 @@
     </div>
   </div>
 
-  <!-- Song Editor Modal -->
+  <div id="profiles-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="profiles-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-users mr-2"></i>Band Profiles</h3>
+        <button onclick="closeModal('profiles')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-4 border-b border-stone-800/50 bg-stone-900 flex gap-2">
+        <input type="text" id="new-profile-name" placeholder="New Member Name" class="flex-1 rounded p-2 focus:outline-none focus:border-teal-500 border bg-stone-800 border-stone-700 text-white" />
+        <button onclick="addProfile()" class="px-4 py-2 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded transition-colors shadow-md text-sm">Add</button>
+      </div>
+      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-2" id="profiles-list-container"></div>
+    </div>
+  </div>
+
+  <div id="reorder-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="reorder-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-list-ol mr-2"></i>Reorder Setlist</h3>
+        <button onclick="closeModal('reorder')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-2" id="reorder-list-container"></div>
+    </div>
+  </div>
+
+  <div id="tuner-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
+    <div id="tuner-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-lg rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden relative">
+      <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
+        <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-music mr-2"></i>Tuner</h3>
+        <button onclick="closeTunerModal()" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-8 pb-12 flex flex-col items-center">
+        <div id="tuner-pitch-display" class="text-[6rem] leading-none font-black text-white drop-shadow-2xl tracking-tighter mb-2 w-32 text-center transition-colors">-</div>
+        <div id="tuner-cents-display" class="text-xl font-bold text-stone-400 mb-8 tracking-widest text-center w-full min-h-[1.75rem] transition-colors">Waiting for signal...</div>
+        <div class="w-full relative px-6 mt-4">
+           <div class="h-4 w-full bg-stone-950 rounded-full border border-stone-700 relative overflow-hidden shadow-inner flex items-center">
+              <div class="absolute left-1/2 w-1 h-full bg-stone-500 z-10 -translate-x-1/2"></div>
+              <div id="tuner-needle" class="absolute w-4 h-full bg-stone-500 rounded-full z-20 transition-all duration-75 shadow-md" style="left: 50%; transform: translateX(-50%);"></div>
+           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <div id="editor-modal" class="fixed inset-0 bg-black/95 z-[10010] hidden flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-md opacity-0 transition-opacity duration-300 print:hidden">
     <div id="editor-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[95vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50">
         <h3 id="editor-modal-title" class="text-lg sm:text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md">Edit Song</h3>
-        <button onclick="closeEditorModal()" class="text-stone-400 hover:text-white text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="closeModal('editor')" class="text-stone-400 hover:text-white text-xl w-8 h-8 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 space-y-4">
         <input type="hidden" id="edit-id">
-        
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div class="space-y-3">
-            <div>
-              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Song Title</label>
-              <input type="text" id="edit-title" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500">
-            </div>
+            <div><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Song Title</label><input type="text" id="edit-title" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500"></div>
             <div class="flex gap-4">
-              <div class="flex-1">
-                <label class="block text-xs font-bold text-stone-400 uppercase mb-1">BPM</label>
-                <input type="number" id="edit-bpm" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500">
-              </div>
-              <div class="flex-1">
-                <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Time Sig</label>
-                <select id="edit-timesig" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500">
-                  <option value="4/4">4/4</option><option value="6/8">6/8</option>
-                </select>
-              </div>
-            </div>
-            <div class="flex gap-4">
-               <div class="flex-1">
-                 <label class="block text-xs font-bold text-stone-400 uppercase mb-1">MIDI PC (Program Change)</label>
-                 <input type="number" id="edit-midi-pc" min="0" max="127" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500" placeholder="e.g. 5">
-               </div>
-               <div class="flex-1">
-                 <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Backing Track (Local)</label>
-                 <input type="file" id="edit-audio-file" accept="audio/*" class="w-full text-xs text-stone-400 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-bold file:bg-stone-700 file:text-teal-400 hover:file:bg-stone-600">
-               </div>
-            </div>
-            <div class="flex items-center gap-3 bg-stone-800/50 p-2 rounded border border-stone-700">
-              <input type="checkbox" id="edit-starred" class="w-5 h-5 accent-teal-500">
-              <label for="edit-starred" class="text-sm font-bold text-stone-300">Priority / Starred Song</label>
+              <div class="flex-1"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">BPM</label><input type="number" id="edit-bpm" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500"></div>
+              <div class="flex-1"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Time Sig</label><select id="edit-timesig" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500"><option value="4/4">4/4</option><option value="6/8">6/8</option></select></div>
             </div>
             <div>
-              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Chords (Comma Separated)</label>
-              <input type="text" id="edit-chords" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 font-mono text-sm">
+              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Groove Feel</label>
+              <select id="edit-feel" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500"><option value="1/4">1/4 Notes</option><option value="1/8-straight">1/8 Straight</option><option value="1/8-swing">1/8 Swing / Shuffle</option><option value="macro">Main Pulses (6/8)</option><option value="micro">All Clicks (6/8)</option></select>
             </div>
+            <div class="flex gap-4">
+               <div class="flex-1"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">MIDI PC (0-127)</label><input type="number" id="edit-midi-pc" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500"></div>
+               <div class="flex-1"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Audio Track</label><input type="file" id="edit-audio-file" accept="audio/*" class="w-full text-xs text-stone-400"></div>
+            </div>
+            <div><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Chords (Comma Separated)</label><input type="text" id="edit-chords" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 font-mono text-sm"></div>
           </div>
-          
           <div class="space-y-3 flex flex-col">
-            <div class="flex-1 flex flex-col">
-              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Performance Notes</label>
-              <textarea id="edit-notes" class="w-full h-24 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea>
-            </div>
-            <div class="flex-1 flex flex-col">
-              <label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics (Use [C] tags for chords)</label>
-              <textarea id="edit-lyrics" class="w-full h-48 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea>
-            </div>
+            <div class="flex-1 flex flex-col"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Performance Notes</label><textarea id="edit-notes" class="w-full h-24 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea></div>
+            <div class="flex-1 flex flex-col"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics (Use [C] tags for chords)</label><textarea id="edit-lyrics" class="w-full h-48 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea></div>
           </div>
         </div>
       </div>
       <div class="p-4 border-t border-stone-800/50 bg-stone-900 flex justify-end gap-3">
-        <button onclick="closeEditorModal()" class="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-bold rounded transition-colors text-sm">Cancel</button>
+        <button onclick="closeModal('editor')" class="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 font-bold rounded transition-colors text-sm">Cancel</button>
         <button onclick="saveSong()" class="px-6 py-2 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded transition-colors shadow-md text-sm">Save Song</button>
       </div>
     </div>
   </div>
 
-  <!-- Lyrics Modal -->
   <div id="lyrics-modal" class="fixed inset-0 bg-black/90 z-[10000] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="lyrics-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[90vh] h-full rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden relative">
       <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50 gap-2 sm:gap-4 flex-wrap sm:flex-nowrap bg-stone-900 z-10 shadow-md">
         <h3 id="lyrics-title" class="text-lg sm:text-2xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md truncate flex-1">Song Lyrics</h3>
         <div id="autoscroll-container" class="flex items-center gap-2 sm:gap-3 bg-stone-800/50 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 border border-stone-700/50 transition-colors duration-300">
-          <button id="autoscroll-btn" onclick="toggleAutoscroll()" class="text-stone-400 hover:text-teal-400 transition-colors flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider outline-none"><i id="autoscroll-icon" class="fa-solid fa-play"></i></button>
+          <button id="autoscroll-btn" onclick="toggleAutoscroll()" class="text-stone-400 hover:text-teal-400 transition-colors flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-wider outline-none"><i id="autoscroll-icon" class="fa-solid fa-play"></i><span class="hidden sm:inline">Scroll</span></button>
           <div class="h-4 w-px bg-stone-500/50"></div>
           <input type="range" id="scroll-speed" min="1" max="50" value="10" class="w-16 sm:w-24 accent-teal-500 h-1 bg-stone-700 rounded-none appearance-none cursor-pointer outline-none">
         </div>
@@ -168,11 +219,15 @@
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
         <span class="w-2.5 h-2.5 rounded-full bg-teal-500 animate-pulse shadow-[0_0_8px_rgba(20,184,166,0.6)]"></span>
-        <h1 class="text-md sm:text-lg font-black tracking-[0.2em] text-teal-500 uppercase drop-shadow-md hidden sm:block">Live Setlist</h1>
+        <h1 class="text-md sm:text-lg font-black tracking-[0.2em] text-teal-500 uppercase drop-shadow-md hidden sm:block">Gigpanion Pro</h1>
       </div>
       
-      <div class="flex-none sm:flex-1 flex justify-center items-center">
-        <div onclick="toggleTimer()" class="cursor-pointer px-2 sm:px-3 py-1 rounded border border-stone-700 bg-stone-800/80 hover:bg-stone-700 flex items-center gap-1.5 sm:gap-2 group transition-colors shadow-inner backdrop-blur-sm">
+      <div class="flex-none sm:flex-1 flex justify-center items-center gap-3">
+        <button id="draw-toggle-btn" onclick="toggleDrawMode()" class="p-1.5 rounded border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-400 transition-colors shadow-inner" title="Draw on Screen">
+           <i class="fa-solid fa-paintbrush"></i>
+        </button>
+
+        <div onclick="toggleTimer()" class="cursor-pointer px-2 sm:px-3 py-1 rounded border border-stone-700 bg-stone-800/80 hover:bg-stone-700 flex items-center gap-1.5 sm:gap-2 group transition-colors shadow-inner backdrop-blur-sm" title="Tap to Start/Pause Timer">
           <i class="fa-solid fa-stopwatch text-stone-500 group-hover:text-teal-400 transition-colors text-[10px] sm:text-xs"></i>
           <span id="stage-timer-display" class="font-mono text-base sm:text-xl font-black tracking-wider leading-none transition-colors text-stone-400">45:00</span>
         </div>
@@ -180,12 +235,12 @@
 
       <div class="relative flex items-center gap-2">
         <select id="song-select" class="bg-stone-800/80 border border-stone-700/80 backdrop-blur-sm text-xs sm:text-sm rounded py-1.5 px-3 focus:outline-none focus:ring-2 focus:ring-teal-500 text-stone-200 max-w-[120px] sm:max-w-[260px]"></select>
-        <button id="settings-toggle" class="p-2 text-stone-300 hover:text-white rounded hover:bg-stone-800/80 transition-colors backdrop-blur-sm"><i class="fa-solid fa-sliders text-base"></i></button>
+        <button id="settings-toggle" class="p-2 text-stone-300 hover:text-white rounded hover:bg-stone-800/80 transition-colors backdrop-blur-sm" title="Settings"><i class="fa-solid fa-sliders text-base"></i></button>
       </div>
     </div>
   </header>
 
-  <div id="settings-panel" class="hidden bg-stone-900/80 backdrop-blur-md border-b border-stone-800 px-4 py-4 transition-all duration-300 print:hidden">
+  <div id="settings-panel" class="hidden bg-stone-900/80 backdrop-blur-md border-b border-stone-800 px-4 py-4 transition-all duration-300 print:hidden absolute top-[52px] left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
     <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
       
       <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner flex flex-col gap-3">
@@ -197,34 +252,88 @@
         </div>
         <div>
           <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Theme / Stage Mode</span>
-          <div class="grid grid-cols-2 gap-2 mb-2">
-            <button onclick="setTheme('dark')" id="theme-dark-btn" class="py-1 px-3 rounded text-xs border border-teal-500 bg-stone-900/80 text-teal-500 font-bold transition-all shadow-md">Dark Stage</button>
-            <button onclick="setTheme('light')" id="theme-light-btn" class="py-1 px-3 rounded text-xs border border-stone-700/80 text-stone-400 hover:border-stone-500 font-bold transition-all">Light Read</button>
+          <div class="grid grid-cols-3 gap-2 mb-2">
+            <button onclick="setTheme('dark')" id="theme-dark-btn" class="py-1 px-2 rounded text-[10px] border border-teal-500 bg-stone-900/80 text-teal-500 font-bold transition-all shadow-md">Dark</button>
+            <button onclick="setTheme('light')" id="theme-light-btn" class="py-1 px-2 rounded text-[10px] border border-stone-700/80 text-stone-400 hover:border-stone-500 font-bold transition-all">Light</button>
+            <button onclick="setTheme('festival')" id="theme-festival-btn" class="py-1 px-2 rounded text-[10px] border border-stone-700/80 text-stone-400 hover:border-stone-500 font-bold transition-all">Festival</button>
           </div>
+          <button onclick="toggleDrummerMode()" class="w-full py-1.5 px-3 rounded text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-300 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-drum"></i> Enter Drummer Mode</button>
         </div>
       </div>
       
-      <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner md:col-span-2 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-         <div>
-            <span class="text-xs font-bold text-stone-400 block mb-1 uppercase tracking-widest">MIDI Output Port</span>
-            <p class="text-[10px] text-stone-500">Sends Program Changes on slide change.</p>
-         </div>
-         <select id="midi-port-select" class="w-48 bg-stone-900 border border-stone-700 rounded p-1.5 text-white text-xs focus:outline-none">
-            <option value="">No MIDI Devices Found</option>
-         </select>
+      <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner flex flex-col justify-between">
+        <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Rehearsal Metronome</span>
+        <div class="flex items-center gap-3 mb-3">
+          <div class="flex gap-2">
+            <button id="metronome-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md"><i class="fa-solid fa-play"></i></button>
+            <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md"><i id="mute-icon" class="fa-solid fa-volume-high"></i></button>
+            <button id="tap-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-300 flex items-center justify-center transition-colors shadow-md touch-none"><span class="text-[10px] font-black pointer-events-none">TAP</span></button>
+          </div>
+          <div class="flex-1">
+            <div class="flex justify-between items-center mb-1">
+              <span id="bpm-display" class="text-xs font-bold text-stone-200">120 BPM</span>
+              <div class="flex items-center gap-2">
+                <button id="flash-toggle-btn" onclick="toggleFlashMode()" class="text-[10px] uppercase font-bold border border-stone-600 text-stone-300 px-2 py-0.5 rounded hover:border-stone-400 transition-all">Flash Off</button>
+                <span id="metronome-blinker" class="w-2 h-2 rounded-full bg-stone-800 border border-stone-700 inline-block transition-colors duration-75"></span>
+              </div>
+            </div>
+            <input type="range" id="bpm-slider" min="50" max="240" value="120" class="w-full accent-teal-500 h-1 bg-stone-800/80 rounded-none appearance-none cursor-pointer">
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-between bg-stone-900 p-2 rounded border border-stone-700 mb-2">
+          <label for="count-in-toggle" class="text-xs font-bold text-stone-300 uppercase tracking-wider flex-1 cursor-pointer">1-Bar Count-In & Auto Mute</label>
+          <input type="checkbox" id="count-in-toggle" onchange="toggleCountIn(this.checked)" class="w-4 h-4 accent-teal-500 cursor-pointer">
+        </div>
+
+        <div class="grid grid-cols-2 gap-2 pt-2 border-t border-stone-800/60">
+          <div><span class="text-[10px] uppercase font-bold text-stone-400 block mb-1">Time Signature</span><div class="flex rounded bg-stone-900/60 p-0.5 border border-stone-800/60"><button id="sig-44-btn" onclick="setTimeSignature('4/4')" class="flex-1 text-[10px] py-1 font-bold rounded bg-stone-800/80 text-teal-500 transition-all border border-teal-500/30 shadow-sm">4/4</button><button id="sig-68-btn" onclick="setTimeSignature('6/8')" class="flex-1 text-[10px] py-1 font-bold rounded text-stone-400 transition-all">6/8</button></div></div>
+          <div><span class="text-[10px] uppercase font-bold text-stone-400 block mb-1">Groove Feel</span><select id="feel-select" onchange="setMetronomeFeel(this.value)" class="w-full bg-stone-900/60 border border-stone-800/60 text-[10px] font-bold rounded p-1 text-stone-300 focus:outline-none py-1"></select></div>
+        </div>
+      </div>
+      
+      <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
+        <div><span class="text-xs font-bold text-stone-400 block mb-1 uppercase tracking-widest">Stage Timer</span><p class="text-[10px] text-stone-500">Counts down your set.</p></div>
+        <div class="flex items-center gap-3 w-full sm:w-auto">
+          <div class="flex items-center gap-2"><input type="number" id="timer-minutes-input" value="45" onchange="setTimerMinutes(this.value)" class="w-16 bg-stone-900 border border-stone-700 rounded p-1.5 text-white text-center focus:outline-none"><span class="text-xs font-bold text-stone-400 uppercase">Min</span></div>
+          <div class="flex-1 sm:flex-none flex justify-end gap-2"><button onclick="resetTimer()" class="py-1.5 px-3 rounded text-xs font-bold border border-stone-700 bg-stone-800 hover:bg-stone-700 text-stone-300 shadow-md">Reset</button></div>
+        </div>
+      </div>
+      
+      <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner flex flex-col justify-center">
+        <div class="flex items-center justify-between w-full">
+           <div><span class="text-xs font-bold text-stone-400 block mb-1 uppercase tracking-widest"><i class="fa-solid fa-cloud text-teal-500 mr-1"></i> Live Device Sync</span><p class="text-[10px] text-stone-500 leading-tight">Master controls slide changes.</p></div>
+           <select id="sync-mode-select" onchange="setSyncMode(this.value)" class="w-32 bg-stone-900 border border-stone-700 rounded p-1.5 text-white font-bold focus:outline-none text-xs"><option value="off">Sync Off</option><option value="master">Master</option><option value="slave">Slave</option></select>
+        </div>
       </div>
 
       <div class="bg-stone-950/50 p-3 rounded border border-stone-800/60 shadow-inner md:col-span-2">
         <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Instruments & Tools</span>
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
-          <button onclick="openManageModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
-          <button onclick="printSetlist()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-file-pdf"></i> PDF / Print</button>
-          <button onclick="exportSetlist()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-download"></i> Backup Data</button>
-          <button onclick="document.getElementById('import-file').click()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-upload"></i> Load File</button>
+          <button onclick="openModal('vault')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-layer-group"></i> Vault</button>
+          <button onclick="openModal('history')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-clock-rotate-left"></i> History</button>
+          <button onclick="openModal('manage')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-pen-to-square"></i> Edit</button>
+          <button onclick="openModal('reorder')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-list-ol"></i> Reorder</button>
+        </div>
+        
+        <div class="flex gap-3 mb-3">
+            <button onclick="openTunerModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-music"></i> Guitar Tuner</button>
+            <button onclick="openModal('profiles')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-users"></i> Profiles</button>
+        </div>
+        
+        <button id="wake-lock-btn" onclick="toggleWakeLock()" class="w-full py-2 px-3 mb-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-mobile-screen"></i> <span id="wake-lock-text">Keep Screen Awake: OFF</span></button>
+        
+        <div class="grid grid-cols-3 gap-3 pt-3 border-t border-stone-800/60">
+          <button onclick="printSetlist()" class="w-full py-2 px-2 rounded text-[10px] sm:text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md"><i class="fa-solid fa-file-pdf"></i> Print PDF</button>
+          <button onclick="exportSetlist()" class="w-full py-2 px-2 rounded text-[10px] sm:text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md"><i class="fa-solid fa-download"></i> Export Data</button>
+          <button onclick="document.getElementById('import-file').click()" class="w-full py-2 px-2 rounded text-[10px] sm:text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md"><i class="fa-solid fa-upload"></i> Import File</button>
           <input type="file" id="import-file" class="hidden" accept=".json" onchange="importSetlist(event)">
         </div>
+        
+        <div class="pt-3 mt-3 border-t border-stone-800/60">
+           <button onclick="openModal('help')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-circle-question"></i> Open App Manual</button>
+        </div>
       </div>
-
     </div>
   </div>
 
@@ -233,120 +342,151 @@
   </div>
 
   <main class="flex-1 flex flex-col justify-center items-center p-2 sm:p-4 md:p-6 select-none relative max-w-5xl mx-auto w-full z-10 h-full overflow-hidden print:hidden">
-    <div id="slide-container" class="w-full h-full flex-1 bg-stone-900/80 backdrop-blur-md rounded-xl p-3 sm:p-5 shadow-2xl border-l-8 border-l-teal-500 border border-stone-800/50 flex flex-col transition-colors duration-300">
-      <div class="flex justify-between items-center border-b border-stone-700/50 pb-1 mb-1">
+    <div id="slide-container" class="w-full h-full flex-1 bg-stone-900/80 backdrop-blur-md rounded-xl p-3 sm:p-5 shadow-2xl border-l-8 border-l-teal-500 border border-stone-800/50 flex flex-col transition-colors duration-300 relative">
+      
+      <canvas id="draw-canvas" class="absolute inset-0 z-30 hidden touch-none" style="width: 100%; height: 100%;"></canvas>
+
+      <div class="flex justify-between items-center border-b border-stone-700/50 pb-1 mb-1 z-40 relative">
         <span id="song-count" class="text-[10px] sm:text-xs font-bold text-stone-400 uppercase tracking-widest drop-shadow-sm">SONG 0 OF 0</span>
         <div id="song-badge" class="flex flex-wrap gap-1.5 justify-end"></div>
       </div>
-      <div id="slide-content" class="flex-1 flex flex-col justify-between min-h-0 overflow-y-auto overflow-x-hidden pr-1 pb-4"></div>
-      <div id="audio-player-container" class="hidden mt-2 p-2 bg-stone-900 rounded border border-stone-700 flex items-center justify-between">
+      <div id="slide-content" class="flex-1 flex flex-col justify-between min-h-0 overflow-y-auto overflow-x-hidden pr-1 pb-4 z-20 relative"></div>
+      
+      <div id="audio-player-container" class="hidden mt-2 p-2 bg-stone-900 rounded border border-stone-700 flex items-center justify-between z-40 relative">
           <span class="text-xs font-bold text-stone-400"><i class="fa-solid fa-headphones mr-2 text-teal-500"></i>Backing Track</span>
           <audio id="slide-audio-player" controls class="h-8 w-64"></audio>
       </div>
+
     </div>
-    <div class="absolute inset-y-0 left-0 w-12 md:w-20 flex items-center justify-start pl-1 pointer-events-none z-20">
+    
+    <div class="absolute inset-y-0 left-0 w-12 md:w-20 flex items-center justify-start pl-1 pointer-events-none z-50">
       <button onclick="prevSlide()" class="pointer-events-auto w-10 h-10 rounded-full bg-stone-950/60 border border-stone-700/50 text-stone-300 hover:text-white flex items-center justify-center shadow-lg backdrop-blur-md active:scale-95 transition-all"><i class="fa-solid fa-chevron-left text-sm"></i></button>
     </div>
-    <div class="absolute inset-y-0 right-0 w-16 md:w-24 flex items-center justify-end pr-2 pointer-events-none">
+    <div class="absolute inset-y-0 right-0 w-16 md:w-24 flex items-center justify-end pr-2 pointer-events-none z-50">
       <button onclick="nextSlide()" class="pointer-events-auto w-10 h-10 rounded-full bg-stone-950/60 border border-stone-700/50 text-stone-300 hover:text-white flex items-center justify-center shadow-lg backdrop-blur-md active:scale-95 transition-all"><i class="fa-solid fa-chevron-right text-sm"></i></button>
     </div>
   </main>
 
+  <footer class="bg-stone-900/70 border-t border-stone-800 py-2 px-4 backdrop-blur-md transition-colors duration-300 z-10 print:hidden">
+    <div class="max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
+      <span class="text-[9px] text-stone-400 tracking-widest uppercase drop-shadow-sm">Gigpanion Rig</span>
+      <span class="text-xs font-black text-stone-300 tracking-widest drop-shadow-sm">2026 ROAD READY</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
+    import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
+    import { getFirestore, doc, setDoc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js';
+    
+    const firebaseConfig = {
+      apiKey: "AIzaSyA64Lv9Let2etB-brS2RKIsSuXnXsH3vdk",
+      authDomain: "gig-companion-71827.firebaseapp.com",
+      projectId: "gig-companion-71827",
+      storageBucket: "gig-companion-71827.firebasestorage.app",
+      messagingSenderId: "181241664709",
+      appId: "1:181241664709:web:a0d3cc291b61faf00cccac"
+    };
+
+    try {
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        signInAnonymously(auth);
+        
+        window.firebaseDB = db;
+        window.firebaseSetDoc = setDoc;
+        window.firebaseDoc = doc;
+        
+        // Luister na wolk veranderinge as internet beskikbaar is
+        onSnapshot(doc(db, 'band_data', 'active_gig'), (snap) => {
+            if(snap.exists() && snap.data().songs) {
+                // Moenie plaaslik oorskryf as ons pas self gestoor het nie om loops te verhoed.
+                // In 'n vinnige Vanilla setup, is BroadcastChannel veiliger vir intydse sync.
+                console.log("Firebase sync connected.");
+            }
+        });
+    } catch(e) { console.error("Firebase init skipped/failed", e); }
+  </script>
+
   <script>
     const chromaticScale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
-
-    // Bandlede volgens inligting voorsien
     const defaultBandOptions = ['Louis', 'Simon', 'Jan Hendrik', 'Vincent'];
 
-    let defaultSetlistData = [
-      {
-        id: "my-first-song",
-        title: "My First Song",
-        bpm: 120,
-        starred: false,
-        midiPC: null,
-        audioUrl: null,
-        chords: ["G", "C", "D"],
-        lines: [
-          { text: "Welcome to Live Setlist!", icon: "fa-music" },
-          { text: "Watch out for the Bass Swell in the bridge", icon: "fa-guitar" },
-          { text: "Simon starts with a Kick-on beat", icon: "fa-drum" }
-        ],
-        timeSig: "4/4",
-        feel: "1/4",
-        lyrics: `Welcome to Gigpanion!\n\nUse [G]ChordPro tags to [C]add chords inline [D]with lyrics!`
-      }
-    ];
-
     let setlistData = [];
+    let vaultData = [];
+    let gigHistory = JSON.parse(localStorage.getItem('pca_gig_history_v2')) || [];
     let bandProfiles = JSON.parse(localStorage.getItem('pca_band_profiles_v2')) || {};
     let activeProfile = localStorage.getItem('pca_active_profile_v2') || 'none';
     let currentAudioFileObj = null;
 
     // --- MIDI SETUP ---
-    let midiAccess = null;
-    let midiOutput = null;
-
-    if (navigator.requestMIDIAccess) {
-        navigator.requestMIDIAccess().then(onMIDISuccess, onMIDIFailure);
-    }
-
-    function onMIDISuccess(midi) {
-        midiAccess = midi;
-        const select = document.getElementById('midi-port-select');
-        select.innerHTML = '<option value="">Select MIDI Device</option>';
-        for (let output of midiAccess.outputs.values()) {
-            select.innerHTML += `<option value="${output.id}">${output.name}</option>`;
-        }
-        select.addEventListener('change', (e) => {
-            midiOutput = midiAccess.outputs.get(e.target.value);
-            showToast(midiOutput ? `MIDI linked: ${midiOutput.name}` : "MIDI Disabled");
-        });
-    }
-    function onMIDIFailure() { console.warn("Could not access your MIDI devices."); }
-
+    let midiAccess = null, midiOutput = null;
+    if (navigator.requestMIDIAccess) navigator.requestMIDIAccess().then(onMIDISuccess, () => console.warn("No MIDI access"));
+    function onMIDISuccess(midi) { midiAccess = midi; }
     function sendMidiProgramChange(pcNum) {
         if (!midiOutput || pcNum === null || pcNum === '') return;
-        try {
-            // MIDI Program Change is 0xC0 (Channel 1). Data byte is PC number (0-127).
-            midiOutput.send([0xC0, parseInt(pcNum)]);
-            console.log(`Sent MIDI PC: ${pcNum}`);
-        } catch(e) { console.error("MIDI Error", e); }
+        try { midiOutput.send([0xC0, parseInt(pcNum)]); console.log(`MIDI PC: ${pcNum}`); } catch(e) {}
     }
+
+    // --- DRAWING CANVAS ---
+    const canvas = document.getElementById('draw-canvas');
+    let ctx = canvas.getContext('2d');
+    let isDrawingMode = false, isDrawing = false;
+
+    function toggleDrawMode() {
+      isDrawingMode = !isDrawingMode;
+      const btn = document.getElementById('draw-toggle-btn');
+      if (isDrawingMode) {
+        canvas.classList.remove('hidden');
+        canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
+        ctx.strokeStyle = 'red'; ctx.lineWidth = 4; ctx.lineCap = 'round';
+        btn.classList.add('text-red-500', 'border-red-500'); btn.classList.remove('text-stone-400');
+      } else {
+        canvas.classList.add('hidden');
+        btn.classList.remove('text-red-500', 'border-red-500'); btn.classList.add('text-stone-400');
+      }
+    }
+    canvas.addEventListener('pointerdown', (e) => { isDrawing = true; const rect = canvas.getBoundingClientRect(); ctx.beginPath(); ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top); });
+    canvas.addEventListener('pointermove', (e) => { if (!isDrawing) return; const rect = canvas.getBoundingClientRect(); ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top); ctx.stroke(); });
+    canvas.addEventListener('pointerup', () => { isDrawing = false; });
+    canvas.addEventListener('pointerout', () => { isDrawing = false; });
 
     // --- PRINT / PDF EXPORT ---
     function printSetlist() {
         const printArea = document.getElementById('print-area');
         let html = `<h1 style="font-size: 24px; border-bottom: 2px solid #000; padding-bottom: 10px; margin-bottom: 20px;">Gigpanion Setlist</h1>`;
-        html += `<p style="font-size: 14px; margin-bottom: 30px; font-weight: bold;">Band: Louis, Simon Kruger, Jan Hendrik Labuschagne, Vincent Rynders</p>`;
-        
+        html += `<p style="font-size: 14px; margin-bottom: 30px; font-weight: bold;">Band: Louis, Simon, Jan Hendrik, Vincent</p>`;
         setlistData.forEach((song, i) => {
-            html += `<div class="print-song">`;
-            html += `<h2>${i + 1}. ${song.title}</h2>`;
-            html += `<p><strong>BPM:</strong> ${song.bpm} | <strong>Chords:</strong> ${(song.chords||[]).join(', ')}</p>`;
-            if(song.lines && song.lines.length > 0) {
-                html += `<p><em>Notes:</em> ${song.lines.map(l=>l.text).join(' - ')}</p>`;
-            }
+            html += `<div class="print-song"><h2>${i + 1}. ${song.title}</h2><p><strong>BPM:</strong> ${song.bpm} | <strong>Chords:</strong> ${(song.chords||[]).join(', ')}</p>`;
+            if(song.lines && song.lines.length > 0) html += `<p><em>Notes:</em> ${song.lines.map(l=>l.text).join(' - ')}</p>`;
             html += `</div>`;
         });
-        printArea.innerHTML = html;
-        window.print();
+        printArea.innerHTML = html; window.print();
     }
 
     // --- DATA LOAD ---
     function loadSetlistData() {
       const savedSetlist = localStorage.getItem('pca_custom_setlist_v2');
-      if (savedSetlist) {
-        try { setlistData = JSON.parse(savedSetlist); } catch(e) { setlistData = JSON.parse(JSON.stringify(defaultSetlistData)); }
-      } else {
-        setlistData = JSON.parse(JSON.stringify(defaultSetlistData));
-      }
+      const savedVault = localStorage.getItem('pca_vault_v2');
+      
+      const defaults = [{ id: "song1", title: "My First Song", bpm: 120, timeSig: "4/4", feel: "1/4", chords: ["G", "C", "D"], lines: [{ text: "Welcome to Gigpanion Pro!", icon: "fa-music" }], lyrics: "Welcome to your rig!" }];
+      
+      try { setlistData = savedSetlist ? JSON.parse(savedSetlist) : JSON.parse(JSON.stringify(defaults)); } catch(e) { setlistData = defaults; }
+      try { vaultData = savedVault ? JSON.parse(savedVault) : JSON.parse(JSON.stringify(defaults)); } catch(e) { vaultData = defaults; }
+      
       applySavedOrder();
     }
 
     function saveCustomSetlist() {
       localStorage.setItem('pca_custom_setlist_v2', JSON.stringify(setlistData));
-      localStorage.setItem('pca_setlist_order_v2', JSON.stringify(setlistData.map(song => song.id)));
+      localStorage.setItem('pca_setlist_order_v2', JSON.stringify(setlistData.map(s => s.id)));
+      localStorage.setItem('pca_vault_v2', JSON.stringify(vaultData));
+      
+      // Optionele Firebase backup as window.firebaseDB bestaan
+      if(window.firebaseDB && window.firebaseSetDoc) {
+          window.firebaseSetDoc(window.firebaseDoc(window.firebaseDB, 'band_data', 'active_gig'), { songs: setlistData }).catch(()=>{});
+      }
     }
 
     function applySavedOrder() {
@@ -364,25 +504,111 @@
       const toast = document.getElementById('toast-notification');
       toast.innerHTML = (isError ? '<i class="fa-solid fa-triangle-exclamation"></i>' : '<i class="fa-solid fa-check"></i>') + ` <span>${message}</span>`;
       toast.className = `fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-300 transform font-black tracking-widest text-xs uppercase flex items-center gap-2 z-[10050] ${isError ? 'bg-red-500 text-white' : 'bg-teal-500 text-stone-900'}`;
-      toast.classList.replace('translate-y-20', 'translate-y-0');
-      toast.classList.remove('opacity-0'); toast.classList.add('opacity-100');
-      setTimeout(() => {
-         toast.classList.replace('translate-y-0', 'translate-y-20');
-         toast.classList.remove('opacity-100'); toast.classList.add('opacity-0');
-      }, 3000);
+      toast.classList.replace('translate-y-20', 'translate-y-0'); toast.classList.replace('opacity-0', 'opacity-100');
+      setTimeout(() => { toast.classList.replace('translate-y-0', 'translate-y-20'); toast.classList.replace('opacity-100', 'opacity-0'); }, 3000);
     }
 
-    let timerMinutes = 45; let timerRemaining = 45 * 60; let isStageTimerRunning = false; let stageTimerInterval = null;
+    // --- MODAL HELPERS ---
+    function openModal(id) {
+        document.getElementById('settings-panel').classList.add('hidden');
+        if(id==='manage') renderManageList();
+        if(id==='profiles') renderProfilesList();
+        if(id==='reorder') renderReorderList();
+        if(id==='vault') renderVaultList();
+        if(id==='history') renderHistoryList();
+        
+        const m = document.getElementById(`${id}-modal`), c = document.getElementById(`${id}-modal-content`);
+        m.classList.remove('hidden'); void m.offsetWidth; m.classList.replace('opacity-0', 'opacity-100'); c.classList.replace('scale-95', 'scale-100');
+    }
+    function closeModal(id) {
+        const m = document.getElementById(`${id}-modal`), c = document.getElementById(`${id}-modal-content`);
+        m.classList.replace('opacity-100', 'opacity-0'); c.classList.replace('scale-100', 'scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
+    }
+
+    // --- VAULT & HISTORY LOGIC ---
+    function renderVaultList() {
+        const container = document.getElementById('vault-list-container'); container.innerHTML = '';
+        container.innerHTML += `<h4 class="font-bold text-white uppercase mb-2 border-b border-stone-700 pb-1">Active Setlist (${setlistData.length})</h4><div class="space-y-2 mb-6">` + 
+          setlistData.map((s,i) => `<div class="flex justify-between bg-stone-800 p-2 rounded border border-stone-700"><span><span class="text-teal-500 font-black mr-2">${i+1}.</span> ${s.title}</span><span class="text-xs text-stone-400">${s.bpm} BPM</span></div>`).join('') + `</div>`;
+        
+        container.innerHTML += `<h4 class="font-bold text-white uppercase mb-2 border-b border-stone-700 pb-1">Master Vault (${vaultData.length})</h4><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">` + 
+          vaultData.map(s => `<div class="text-sm bg-stone-950 p-2 rounded border border-stone-800 flex justify-between items-center"><span>${s.title}</span><button onclick="addFromVault('${s.id}')" class="text-teal-500 hover:text-white"><i class="fa-solid fa-plus"></i></button></div>`).join('') + `</div>`;
+    }
+    
+    function addFromVault(id) {
+        const song = vaultData.find(s=>s.id===id);
+        if(song) { setlistData.push({...song, id: song.id + '-' + Date.now()}); saveCustomSetlist(); renderVaultList(); populateSelector(); renderSlide(currentSlideIndex); showToast("Added to Gig!"); }
+    }
+
+    function autoGenerateSetlist() {
+        const mins = parseInt(document.getElementById('auto-min').value) || 45;
+        const targetSongs = Math.max(1, Math.floor(mins / 4));
+        let shuffled = [...vaultData].sort(() => 0.5 - Math.random());
+        setlistData = shuffled.slice(0, targetSongs);
+        saveCustomSetlist(); populateSelector(); renderSlide(0); closeModal('vault'); showToast(`Smart Setlist Created (${targetSongs} songs)`);
+    }
+
+    function saveGigToHistory() {
+        const venue = prompt("Enter Venue Name to save to History:");
+        if(!venue) return;
+        const newRecord = { date: new Date().toISOString().split('T')[0], venue, songs: setlistData.map(s=>s.title) };
+        gigHistory = [newRecord, ...gigHistory];
+        localStorage.setItem('pca_gig_history_v2', JSON.stringify(gigHistory));
+        showToast("Saved to History!");
+    }
+
+    function renderHistoryList() {
+        const container = document.getElementById('history-list-container'); container.innerHTML = '';
+        if(gigHistory.length === 0) { container.innerHTML = `<p class="text-stone-500 text-center">No past gigs recorded yet.</p>`; return; }
+        gigHistory.forEach((gig) => {
+            container.innerHTML += `<div class="bg-stone-800 border border-stone-700 rounded-lg p-4"><div class="flex justify-between items-start mb-2"><h4 class="font-black text-white text-lg">${gig.venue}</h4><span class="text-xs font-bold text-teal-500 bg-teal-950 px-2 py-1 rounded">${gig.date}</span></div><p class="text-sm text-stone-400 leading-relaxed"><strong>Setlist:</strong> ${gig.songs.join(' → ')}</p></div>`;
+        });
+    }
+
+    // --- STAGE TIMER ---
+    let timerMinutes = 45, timerRemaining = 45 * 60, isStageTimerRunning = false, stageTimerInterval = null, stageTimerTarget = 0;
     function toggleTimer() {
       if (isStageTimerRunning) { clearInterval(stageTimerInterval); isStageTimerRunning = false; } 
-      else { const t = Date.now() + (timerRemaining * 1000); stageTimerInterval = setInterval(() => { timerRemaining = Math.ceil((t - Date.now()) / 1000); updateTimerDisplay(); }, 250); isStageTimerRunning = true; }
+      else { stageTimerTarget = Date.now() + (timerRemaining * 1000); stageTimerInterval = setInterval(() => { timerRemaining = Math.ceil((stageTimerTarget - Date.now()) / 1000); updateTimerDisplay(); }, 250); isStageTimerRunning = true; }
       updateTimerDisplay();
     }
     function resetTimer() { if (isStageTimerRunning) toggleTimer(); timerRemaining = timerMinutes * 60; updateTimerDisplay(); }
+    function setTimerMinutes(val) { timerMinutes = parseInt(val) || 45; resetTimer(); }
     function updateTimerDisplay() {
       const display = document.getElementById('stage-timer-display'); if (!display) return;
       const absSeconds = Math.abs(timerRemaining); display.textContent = `${timerRemaining < 0 ? '-' : ''}${String(Math.floor(absSeconds / 60)).padStart(2, '0')}:${String(absSeconds % 60).padStart(2, '0')}`;
       display.className = "font-mono text-base sm:text-xl font-black tracking-wider leading-none transition-colors " + (timerRemaining <= 60 ? "text-red-500 animate-pulse" : timerRemaining <= 300 ? "text-amber-500" : isStageTimerRunning ? "text-teal-400" : "text-stone-400");
+    }
+
+    // --- LIVE SYNC ---
+    let syncMode = localStorage.getItem('pca_sync_mode_v2') || 'off'; 
+    let syncChannel = new BroadcastChannel('gigpanion_sync_channel');
+    syncChannel.onmessage = (e) => {
+        if(syncMode === 'slave' && e.data.type === 'SLIDE_CHANGE' && e.data.index !== currentSlideIndex) {
+            renderSlide(e.data.index); showToast("Sync: Moved to Song " + (e.data.index + 1));
+        }
+    };
+    function broadcastSlideChange(index) { if(syncMode === 'master') syncChannel.postMessage({ type: 'SLIDE_CHANGE', index: index }); }
+    function setSyncMode(mode) { syncMode = mode; localStorage.setItem('pca_sync_mode_v2', mode); showToast("Sync Mode: " + mode.toUpperCase()); }
+
+    // --- TRANSPOSE ---
+    function transposeChordString(chord, steps) {
+      if (!chord || chord === '/') return chord;
+      const match = chord.match(/^([A-G][#b]?)(.*)$/i); if (!match) return chord;
+      let rootUpper = match[1].charAt(0).toUpperCase() + match[1].slice(1), rest = match[2];
+      let rootIndex = chromaticScale.findIndex(c => c === rootUpper);
+      if (rootIndex === -1) { const flatsMap = {'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#'}; if (flatsMap[rootUpper]) rootIndex = chromaticScale.indexOf(flatsMap[rootUpper]); }
+      if (rootIndex === -1) return chord; 
+      let newIndex = (rootIndex + steps) % 12; if (newIndex < 0) newIndex += 12;
+      let newRoot = chromaticScale[newIndex];
+      if (rest.includes('/')) { let parts = rest.split('/'); return newRoot + parts[0] + '/' + transposeChordString(parts[1], steps); }
+      return newRoot + rest;
+    }
+    function transposeCurrentSong(steps) {
+      const song = setlistData[currentSlideIndex]; if (!song) return;
+      if (song.chords && song.chords.length > 0) song.chords = song.chords.map(c => transposeChordString(c, steps));
+      if (song.lyrics) song.lyrics = song.lyrics.replace(/\[([A-G][A-Za-z0-9#\/]*)\]/g, (m, c) => '[' + transposeChordString(c, steps) + ']');
+      saveCustomSetlist(); renderSlide(currentSlideIndex); showToast(steps > 0 ? "Transposed +1" : "Transposed -1");
     }
 
     // --- PROFILES LOGIC ---
@@ -391,29 +617,31 @@
         select.innerHTML = '<option value="none">None (Standard)</option>';
         Object.keys(bandProfiles).forEach(name => { select.innerHTML += `<option value="${name}">${name}</option>`; });
         select.value = activeProfile;
+        document.getElementById('sync-mode-select').value = syncMode;
     }
     function setActiveProfile(val) {
         activeProfile = val; localStorage.setItem('pca_active_profile_v2', activeProfile); showToast("Profile set to " + activeProfile);
-        if (activeProfile.toLowerCase() === 'louis') showLyrics();
+        if(activeProfile.toLowerCase() === 'simon' && !document.getElementById('drummer-mode-overlay').classList.contains('opacity-100')) toggleDrummerMode();
+        else if (activeProfile.toLowerCase() === 'louis') showLyrics();
     }
+    function renderProfilesList() {
+      const container = document.getElementById('profiles-list-container'); container.innerHTML = '';
+      const keys = Object.keys(bandProfiles);
+      if (keys.length === 0) {
+        container.innerHTML = `<div class="text-center py-6"><p class="text-sm mb-4 text-stone-400">Quick add your band:</p><div class="flex flex-wrap gap-2 justify-center">` + defaultBandOptions.map(name => `<button onclick="addProfile('${name}')" class="px-3 py-1.5 rounded-full border border-stone-600 bg-stone-800 text-stone-300 text-xs font-bold hover:border-teal-500 transition-all">+ ${name}</button>`).join('') + `</div></div>`;
+        return;
+      }
+      keys.forEach(name => { container.innerHTML += `<div class="flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-stone-900 font-black uppercase">${name.charAt(0)}</div><p class="font-bold text-white">${name}</p></div><button onclick="deleteProfile('${name}')" class="w-8 h-8 rounded bg-stone-700 hover:bg-red-600/80 text-red-400 transition-colors"><i class="fa-solid fa-trash"></i></button></div>`; });
+    }
+    function addProfile(nameOverride) { const name = (nameOverride || document.getElementById('new-profile-name').value).trim(); if (!name) return; bandProfiles[name] = { role: 'Band Member' }; localStorage.setItem('pca_band_profiles_v2', JSON.stringify(bandProfiles)); document.getElementById('new-profile-name').value = ''; renderProfilesList(); initProfilesUI(); showToast("Profile Added"); }
+    function deleteProfile(name) { if (confirm(`Delete ${name}?`)) { delete bandProfiles[name]; localStorage.setItem('pca_band_profiles_v2', JSON.stringify(bandProfiles)); renderProfilesList(); initProfilesUI(); showToast("Profile Deleted"); } }
 
     // --- MANAGE SONGS & EDITOR ---
-    function openManageModal() {
-      settingsPanel.classList.add('hidden'); renderManageList();
-      const m = document.getElementById('manage-modal'), c = document.getElementById('manage-modal-content');
-      m.classList.remove('hidden'); void m.offsetWidth; m.classList.replace('opacity-0', 'opacity-100'); c.classList.replace('scale-95', 'scale-100');
-    }
-    function closeManageModal() {
-      const m = document.getElementById('manage-modal'), c = document.getElementById('manage-modal-content');
-      m.classList.replace('opacity-100', 'opacity-0'); c.classList.replace('scale-100', 'scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
-    }
     function renderManageList() {
       const container = document.getElementById('manage-list-container'); container.innerHTML = '';
-      setlistData.forEach((song) => {
-        container.innerHTML += `<div class="flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700"><div class="flex-1 truncate pr-4"><p class="text-white font-bold text-sm sm:text-base truncate">${song.title}</p><p class="text-teal-400 text-xs">${song.bpm} BPM</p></div><div class="flex gap-2"><button onclick="openEditorModal('${song.id}')" class="w-8 h-8 rounded bg-stone-700 hover:bg-stone-600 text-teal-400 flex items-center justify-center transition-colors"><i class="fa-solid fa-pen"></i></button></div></div>`;
-      });
+      if(setlistData.length === 0) { container.innerHTML = `<p class="text-stone-500 text-center py-4">No songs.</p>`; return; }
+      setlistData.forEach((song) => { container.innerHTML += `<div class="flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700"><div class="flex-1 truncate pr-4"><p class="text-white font-bold text-sm truncate">${song.title}</p><p class="text-teal-400 text-xs">${song.bpm} BPM</p></div><div class="flex gap-2"><button onclick="openEditorModal('${song.id}')" class="w-8 h-8 rounded bg-stone-700 text-teal-400 transition-colors"><i class="fa-solid fa-pen"></i></button><button onclick="deleteSong('${song.id}')" class="w-8 h-8 rounded bg-stone-700 text-red-400 transition-colors"><i class="fa-solid fa-trash"></i></button></div></div>`; });
     }
-
     function openEditorModal(songId = null) {
       const m = document.getElementById('editor-modal'), c = document.getElementById('editor-modal-content');
       document.getElementById('edit-id').value = ''; document.getElementById('edit-title').value = ''; document.getElementById('edit-bpm').value = '120'; document.getElementById('edit-midi-pc').value = ''; document.getElementById('edit-chords').value = ''; document.getElementById('edit-notes').value = ''; document.getElementById('edit-lyrics').value = '';
@@ -426,29 +654,168 @@
         }
       } else document.getElementById('editor-modal-title').textContent = 'Add New Song';
       
-      // Handle audio upload logic locally
-      document.getElementById('edit-audio-file').onchange = (e) => {
-         const file = e.target.files[0];
-         if(file) currentAudioFileObj = URL.createObjectURL(file);
-      };
-
+      document.getElementById('edit-audio-file').onchange = (e) => { const file = e.target.files[0]; if(file) currentAudioFileObj = URL.createObjectURL(file); };
       m.classList.remove('hidden'); void m.offsetWidth; m.classList.replace('opacity-0', 'opacity-100'); c.classList.replace('scale-95', 'scale-100');
-    }
-    
-    function closeEditorModal() {
-      const m = document.getElementById('editor-modal'), c = document.getElementById('editor-modal-content');
-      m.classList.replace('opacity-100', 'opacity-0'); c.classList.replace('scale-100', 'scale-95'); setTimeout(() => m.classList.add('hidden'), 300);
     }
     
     function saveSong() {
       const title = document.getElementById('edit-title').value.trim(); if (!title) return showToast("Title required", true);
       const id = document.getElementById('edit-id').value, rawChords = document.getElementById('edit-chords').value, rawNotes = document.getElementById('edit-notes').value;
       const songObj = {
-        id: id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'), title: title, bpm: parseInt(document.getElementById('edit-bpm').value) || 120, midiPC: document.getElementById('edit-midi-pc').value || null, audioUrl: currentAudioFileObj || (id ? setlistData.find(s=>s.id===id).audioUrl : null), chords: rawChords.split(',').map(c => c.trim()).filter(c => c.length > 0), lines: rawNotes.split('\n').filter(n => n.trim().length > 0).map(n => ({ text: n.trim(), icon: "fa-circle-dot" })), lyrics: document.getElementById('edit-lyrics').value.trim()
+        id: id || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'), title: title, bpm: parseInt(document.getElementById('edit-bpm').value) || 120, timeSig: document.getElementById('edit-timesig').value, feel: document.getElementById('edit-feel').value, midiPC: document.getElementById('edit-midi-pc').value || null, audioUrl: currentAudioFileObj || (id ? setlistData.find(s=>s.id===id).audioUrl : null), chords: rawChords.split(',').map(c => c.trim()).filter(c => c.length > 0), lines: rawNotes.split('\n').filter(n => n.trim().length > 0).map(n => ({ text: n.trim(), icon: "fa-circle-dot" })), lyrics: document.getElementById('edit-lyrics').value.trim()
       };
       if (id) { const idx = setlistData.findIndex(s => s.id === id); if (idx !== -1) setlistData[idx] = songObj; } 
-      else { let newId = songObj.id, c = 1; while(setlistData.some(s => s.id === newId)) { newId = `${songObj.id}-${c}`; c++; } songObj.id = newId; setlistData.push(songObj); }
-      saveCustomSetlist(); populateSelector(); renderSlide(id ? currentSlideIndex : setlistData.length - 1); renderManageList(); closeEditorModal(); currentAudioFileObj = null; showToast(id ? "Updated" : "Added");
+      else { let newId = songObj.id, c = 1; while(setlistData.some(s => s.id === newId)) { newId = `${songObj.id}-${c}`; c++; } songObj.id = newId; setlistData.push(songObj); vaultData.push(songObj); }
+      saveCustomSetlist(); populateSelector(); renderSlide(id ? currentSlideIndex : setlistData.length - 1); renderManageList(); closeModal('editor'); currentAudioFileObj = null; showToast(id ? "Updated" : "Added");
+    }
+    function deleteSong(songId) {
+      if (confirm("Delete song?")) { const idx = setlistData.findIndex(s => s.id === songId); if (idx !== -1) { setlistData.splice(idx, 1); saveCustomSetlist(); if(setlistData.length === 0) setlistData.push({ id: "blank", title: "Empty", bpm: 120, lines: [], chords: [], lyrics: "" }); populateSelector(); renderSlide(currentSlideIndex >= setlistData.length ? setlistData.length - 1 : currentSlideIndex); renderManageList(); showToast("Deleted"); } }
+    }
+
+    // --- REORDER MODAL ---
+    let draggedReorderIndex = null;
+    function renderReorderList() {
+      const container = document.getElementById('reorder-list-container'); container.innerHTML = '';
+      setlistData.forEach((song, i) => {
+        const div = document.createElement('div'); div.className = 'flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700 transition-all'; div.draggable = true;
+        div.ondragstart = (e) => { draggedReorderIndex = i; e.dataTransfer.effectAllowed = 'move'; setTimeout(() => div.classList.add('dragging'), 0); };
+        div.ondragover = (e) => e.preventDefault();
+        div.ondrop = (e) => { e.preventDefault(); if (draggedReorderIndex !== null && draggedReorderIndex !== i) { const song = setlistData.splice(draggedReorderIndex, 1)[0]; setlistData.splice(i, 0, song); saveCustomSetlist(); renderReorderList(); populateSelector(); renderSlide(currentSlideIndex); } };
+        div.ondragend = () => { div.classList.remove('dragging'); draggedReorderIndex = null; };
+        div.innerHTML = `<div class="flex items-center gap-4 w-full"><div class="flex flex-col text-stone-500"><button onclick="moveReorderUp(${i})" class="${i === 0 ? 'invisible' : ''} hover:text-teal-400 p-2 -my-1"><i class="fa-solid fa-chevron-up text-sm"></i></button><i class="fa-solid fa-grip-lines cursor-grab text-center py-2 -my-1 hidden sm:block"></i><button onclick="moveReorderDown(${i})" class="${i === setlistData.length - 1 ? 'invisible' : ''} hover:text-teal-400 p-2 -my-1"><i class="fa-solid fa-chevron-down text-sm"></i></button></div><div class="flex-1 truncate"><p class="text-white font-bold text-sm truncate">${i + 1}. ${song.title}</p></div></div>`;
+        container.appendChild(div);
+      });
+    }
+    function moveReorderUp(i) { if (i > 0) { const tmp = setlistData[i]; setlistData[i] = setlistData[i-1]; setlistData[i-1] = tmp; saveCustomSetlist(); renderReorderList(); populateSelector(); renderSlide(currentSlideIndex); } }
+    function moveReorderDown(i) { if (i < setlistData.length - 1) { const tmp = setlistData[i]; setlistData[i] = setlistData[i+1]; setlistData[i+1] = tmp; saveCustomSetlist(); renderReorderList(); populateSelector(); renderSlide(currentSlideIndex); } }
+
+    // --- TUNER LOGIC ---
+    let tunerContext = null, tunerAnalyser = null, tunerStream = null, tunerReq = null;
+    const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    function openTunerModal() { openModal('tuner'); initTuner(); }
+    function closeTunerModal() { closeModal('tuner'); stopTuner(); }
+    async function initTuner() {
+      try {
+        tunerStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        tunerContext = new (window.AudioContext || window.webkitAudioContext)();
+        tunerAnalyser = tunerContext.createAnalyser(); tunerAnalyser.fftSize = 4096; 
+        tunerContext.createMediaStreamSource(tunerStream).connect(tunerAnalyser);
+        updateTuner();
+      } catch (err) { document.getElementById('tuner-cents-display').textContent = "Mic access denied."; document.getElementById('tuner-cents-display').className = "text-xl font-bold text-red-500 mb-8 tracking-widest text-center w-full min-h-[1.75rem]"; }
+    }
+    function stopTuner() { if (tunerReq) cancelAnimationFrame(tunerReq); if (tunerStream) tunerStream.getTracks().forEach(t => t.stop()); if (tunerContext) { tunerContext.close(); tunerContext = null; } }
+    function noteFromPitch(f) { return Math.round(12 * (Math.log(f / 440) / Math.log(2))) + 69; }
+    function frequencyFromNoteNumber(n) { return 440 * Math.pow(2, (n - 69) / 12); }
+    function centsOffFromPitch(f, n) { return Math.floor(1200 * Math.log(f / frequencyFromNoteNumber(n)) / Math.log(2)); }
+    function autoCorrelate(buf, sr) {
+      let SIZE = buf.length, rms = 0; for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / SIZE);
+      if (rms < 0.01) return -1;
+      let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+      for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+      for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+      buf = buf.slice(r1, r2); SIZE = buf.length; let c = new Float32Array(SIZE);
+      for (let i = 0; i < SIZE; i++) { for (let j = 0; j < SIZE - i; j++) { c[i] = c[i] + buf[j] * buf[j + i]; } }
+      let d = 0; while (c[d] > c[d + 1]) d++;
+      let maxval = -1, maxpos = -1;
+      for (let i = d; i < SIZE; i++) { if (c[i] > maxval) { maxval = c[i]; maxpos = i; } }
+      let T0 = maxpos, x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1]; let a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
+      if (a) T0 = T0 - b / (2 * a); return sr / T0;
+    }
+    function updateTuner() {
+      if (!tunerAnalyser) return;
+      const buffer = new Float32Array(tunerAnalyser.fftSize); tunerAnalyser.getFloatTimeDomainData(buffer);
+      const pitch = autoCorrelate(buffer, tunerContext.sampleRate);
+      const pitchDisplay = document.getElementById('tuner-pitch-display'), centsDisplay = document.getElementById('tuner-cents-display'), needle = document.getElementById('tuner-needle');
+      if (pitch !== -1) {
+        const note = noteFromPitch(pitch), cents = centsOffFromPitch(pitch, note);
+        pitchDisplay.textContent = noteStrings[note % 12]; centsDisplay.textContent = cents > 0 ? `+${cents} cents` : `${cents} cents`;
+        needle.style.left = `${50 + Math.max(-50, Math.min(50, cents))}%`;
+        if (Math.abs(cents) <= 3) { needle.className = "absolute w-4 h-full bg-emerald-500 rounded-full z-20 shadow-[0_0_12px_rgba(16,185,129,0.9)] scale-110"; centsDisplay.className = "text-xl font-bold text-emerald-400 mb-8 tracking-widest text-center w-full min-h-[1.75rem]"; pitchDisplay.className = "text-[6rem] leading-none font-black text-emerald-400 tracking-tighter mb-2 w-32 text-center"; } 
+        else { needle.className = "absolute w-4 h-full bg-red-500 rounded-full z-20 shadow-[0_0_8px_rgba(239,68,68,0.8)]"; centsDisplay.className = "text-xl font-bold text-stone-400 mb-8 tracking-widest text-center w-full min-h-[1.75rem]"; pitchDisplay.className = "text-[6rem] leading-none font-black text-white tracking-tighter mb-2 w-32 text-center"; }
+      }
+      tunerReq = requestAnimationFrame(updateTuner);
+    }
+
+    // --- WAKE LOCK LOGIC ---
+    let wakeLock = null, isWakeLockEnabled = false;
+    function checkWakeLockSupport() { if (!('wakeLock' in navigator)) updateWakeLockUI('unsupported'); }
+    async function requestWakeLock() {
+      if ('wakeLock' in navigator) {
+        try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { if(isWakeLockEnabled && document.visibilityState === 'visible') { updateWakeLockUI(false); isWakeLockEnabled = false; } }); updateWakeLockUI(true); } 
+        catch (err) { isWakeLockEnabled = false; updateWakeLockUI(false); }
+      }
+    }
+    function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release().then(() => { wakeLock = null; updateWakeLockUI(false); }); } }
+    function toggleWakeLock() { const btn = document.getElementById('wake-lock-btn'); if (btn && btn.disabled) return; if (isWakeLockEnabled) { isWakeLockEnabled = false; releaseWakeLock(); } else { isWakeLockEnabled = true; requestWakeLock(); } }
+    function updateWakeLockUI(status) {
+      const btn = document.getElementById('wake-lock-btn'), textSpan = document.getElementById('wake-lock-text'); if (!btn) return;
+      if (status === 'unsupported') { textSpan.textContent = "Screen Awake: Not Supported"; btn.classList.add('opacity-50', 'cursor-not-allowed'); btn.disabled = true; } 
+      else if (status === true) { btn.innerHTML = '<i class="fa-solid fa-mobile-screen text-teal-400"></i> <span id="wake-lock-text" class="text-teal-400">Keep Screen Awake: ON</span>'; btn.classList.add('border-teal-500/50', 'bg-stone-800'); } 
+      else { btn.innerHTML = '<i class="fa-solid fa-mobile-screen"></i> <span id="wake-lock-text">Keep Screen Awake: OFF</span>'; btn.classList.remove('border-teal-500/50', 'bg-stone-800'); }
+    }
+    document.addEventListener('visibilitychange', async () => { if (isWakeLockEnabled && wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock(); });
+
+    // --- METRONOME ---
+    let isMetronomeRunning = false, isFlashModeEnabled = false, isMetronomeMuted = false, metronomeBpm = 120, timeSignature = "4/4", metronomeFeel = "1/4", metronomeContext = null, timerID = null, nextNoteTime = 0.0, currentSubdivision = 0;
+    const lookahead = 25.0, scheduleAheadTime = 0.1;
+    let isCountInEnabled = false, countInCounter = 0;
+    const blinker = document.getElementById('metronome-blinker'), flashOverlay = document.getElementById('stage-flash-overlay');
+
+    function toggleCountIn(val) { isCountInEnabled = val; }
+    function setTimeSignature(sig) { timeSignature = sig; metronomeFeel = sig === "4/4" ? "1/4" : "macro"; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } }
+    function setMetronomeFeel(feel) { metronomeFeel = feel; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } }
+    function toggleMute() { isMetronomeMuted = !isMetronomeMuted; const icon = document.getElementById('mute-icon'); if (isMetronomeMuted) icon.className = "fa-solid fa-volume-xmark"; else icon.className = "fa-solid fa-volume-high"; }
+    function toggleFlashMode() { isFlashModeEnabled = !isFlashModeEnabled; }
+
+    function advanceNote() {
+      let spb = 60.0 / metronomeBpm;
+      if (timeSignature === "4/4") {
+        if (metronomeFeel === "1/4") { nextNoteTime += spb; currentSubdivision = (currentSubdivision + 1) % 4; }
+        else if (metronomeFeel === "1/8-straight") { nextNoteTime += 0.5 * spb; currentSubdivision = (currentSubdivision + 1) % 8; }
+        else if (metronomeFeel === "1/8-swing") { nextNoteTime += (currentSubdivision % 2 === 0) ? (2/3) * spb : (1/3) * spb; currentSubdivision = (currentSubdivision + 1) % 8; }
+      } else { nextNoteTime += (spb * 0.5); currentSubdivision = (currentSubdivision + 1) % 6; }
+    }
+
+    function scheduleNote(beatNumber, time) {
+      let playSound = true, freq = 800, vol = 0.35;
+      if (timeSignature === "4/4") { if (beatNumber === 0) freq = 1200; else if (beatNumber % 2 !== 0 && metronomeFeel !== "1/4") { freq = 580; vol = 0.12; } else if (beatNumber % 2 === 0 && metronomeFeel !== "1/4") freq = 850; } 
+      else { if (beatNumber === 0) freq = 1200; else if (beatNumber === 3) freq = 850; else playSound = false; }
+      
+      let trigger = (timeSignature === "4/4") ? (metronomeFeel === "1/4" || beatNumber % 2 === 0) : (beatNumber === 0 || beatNumber === 3);
+
+      if (playSound && !isMetronomeMuted) {
+        const osc = metronomeContext.createOscillator(), gain = metronomeContext.createGain();
+        osc.connect(gain); gain.connect(metronomeContext.destination); osc.type = 'triangle'; osc.frequency.setValueAtTime(freq, time);
+        gain.gain.setValueAtTime(vol, time); gain.gain.exponentialRampToValueAtTime(0.01, time + 0.05);
+        osc.start(time); osc.stop(time + 0.06);
+      }
+      
+      if(trigger && isCountInEnabled && countInCounter > 0) {
+          countInCounter--; if(countInCounter === 0) setTimeout(() => { isMetronomeMuted = true; toggleMute(); toggleMute(); isMetronomeMuted=true; }, (time - metronomeContext.currentTime) * 1000);
+      }
+      
+      setTimeout(() => {
+        if (trigger) {
+          blinker.className = "w-2 h-2 rounded-full border border-stone-700 inline-block transition-colors duration-75 " + (beatNumber === 0 ? "bg-emerald-500" : "bg-lime-400");
+          if (isFlashModeEnabled) { flashOverlay.style.backgroundColor = (beatNumber === 0) ? '#10b981' : '#a3e635'; flashOverlay.classList.add('flash-active'); setTimeout(() => { flashOverlay.classList.remove('flash-active'); }, 60); }
+          setTimeout(() => { blinker.className = "w-2 h-2 rounded-full border border-stone-700 bg-stone-800 inline-block transition-colors duration-75"; }, 80);
+        }
+      }, Math.max(0, (time - metronomeContext.currentTime) * 1000));
+    }
+
+    function schedulerLoop() { while (nextNoteTime < metronomeContext.currentTime + scheduleAheadTime) { scheduleNote(currentSubdivision, nextNoteTime); advanceNote(); } timerID = setTimeout(schedulerLoop, lookahead); }
+    function startMetronome() {
+      if (!metronomeContext) metronomeContext = new (window.AudioContext || window.webkitAudioContext)();
+      isMetronomeRunning = true; const btn = document.getElementById('metronome-btn'); btn.innerHTML = '<i class="fa-solid fa-pause"></i>'; btn.classList.replace('text-teal-500', 'text-red-500');
+      nextNoteTime = metronomeContext.currentTime + 0.02; currentSubdivision = 0;
+      if(isCountInEnabled) { countInCounter = timeSignature === "4/4" ? 4 : 6; isMetronomeMuted = false; }
+      schedulerLoop();
+    }
+    function stopMetronome() { isMetronomeRunning = false; const btn = document.getElementById('metronome-btn'); btn.innerHTML = '<i class="fa-solid fa-play"></i>'; btn.classList.replace('text-red-500', 'text-teal-500'); clearTimeout(timerID); }
+    function toggleDrummerMode() {
+      const mode = document.getElementById('drummer-mode-overlay');
+      if (mode.classList.contains('opacity-0')) { mode.classList.replace('opacity-0', 'opacity-100'); mode.classList.replace('pointer-events-none', 'pointer-events-auto'); if (!isFlashModeEnabled) toggleFlashMode(); if (!isMetronomeRunning) startMetronome(); document.getElementById('settings-panel').classList.add('hidden'); } 
+      else { mode.classList.replace('opacity-100', 'opacity-0'); mode.classList.replace('pointer-events-auto', 'pointer-events-none'); if (isFlashModeEnabled) toggleFlashMode(); if (isMetronomeRunning) stopMetronome(); }
     }
 
     // --- RENDER SLIDE ---
@@ -460,47 +827,46 @@
       setlistData.forEach((song, idx) => { songSelect.innerHTML += `<option value="${idx}">${idx + 1}. ${song.title} (${song.bpm} BPM)</option>`; });
       songSelect.value = currentSlideIndex; songSelect.addEventListener('change', (e) => renderSlide(parseInt(e.target.value)));
     }
-    
     settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
 
     function renderSlide(index, direction = '') {
-      if (setlistData.length === 0) return;
-      currentSlideIndex = index; songSelect.value = index;
-      const song = setlistData[index];
+      if(ctx) ctx.clearRect(0,0, canvas.width, canvas.height); // Clear Canvas
       
-      // FIRE MIDI EVENT
+      if (setlistData.length === 0) { slideContent.innerHTML = `<h2 class="text-2xl text-stone-500 font-bold text-center mt-10">Setlist is empty.</h2>`; songCount.textContent = `SONG 0 OF 0`; progressIndicator.style.width = `0%`; return; }
+      if (index < 0 || index >= setlistData.length) return;
+      currentSlideIndex = index; songSelect.value = index;
+      const song = setlistData[index]; metronomeBpm = song.bpm; document.getElementById('bpm-slider').value = metronomeBpm; document.getElementById('bpm-display').textContent = `${metronomeBpm} BPM`;
+      
       if (song.midiPC !== null) sendMidiProgramChange(song.midiPC);
       
-      // AUDIO PLAYER SETUP
-      const audioContainer = document.getElementById('audio-player-container');
-      const audioPlayer = document.getElementById('slide-audio-player');
-      if(song.audioUrl) {
-          audioContainer.classList.remove('hidden');
-          audioPlayer.src = song.audioUrl;
-      } else {
-          audioContainer.classList.add('hidden');
-          audioPlayer.pause();
-          audioPlayer.src = '';
-      }
+      const audioContainer = document.getElementById('audio-player-container'), audioPlayer = document.getElementById('slide-audio-player');
+      if(song.audioUrl) { audioContainer.classList.remove('hidden'); audioPlayer.src = song.audioUrl; } else { audioContainer.classList.add('hidden'); audioPlayer.pause(); audioPlayer.src = ''; }
 
+      if (song.timeSig) { timeSignature = song.timeSig; metronomeFeel = song.feel; }
+      if (isMetronomeRunning) { stopMetronome(); startMetronome(); }
+      
       slideContainer.classList.remove('slide-enter-right', 'slide-enter-left'); void slideContainer.offsetWidth;
       if (direction === 'right') slideContainer.classList.add('slide-enter-right'); else if (direction === 'left') slideContainer.classList.add('slide-enter-left');
       
       songCount.textContent = `SONG ${index + 1} OF ${setlistData.length}`; progressIndicator.style.width = `${((index + 1) / setlistData.length) * 100}%`;
       songBadge.innerHTML = `<span class="bg-stone-800/90 text-stone-300 font-bold text-[11px] px-2.5 py-0.5 rounded border border-stone-700/80 shadow-sm"><i class="fa-solid fa-gauge-high text-teal-400"></i> ${song.bpm} BPM</span>`;
+      if(song.transition) songBadge.innerHTML += `<span class="bg-stone-800 text-teal-400 font-black text-[10px] px-2 py-0.5 rounded uppercase flex items-center gap-1 shadow-sm animate-pulse border border-teal-500/50"><i class="fa-solid fa-plug"></i> Transition</span>`;
       
-      let html = `<h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3 text-white uppercase drop-shadow-lg leading-none"><span class="bg-teal-500 text-stone-950 px-2 py-1 sm:px-3 sm:py-1 rounded-lg text-xl sm:text-3xl lg:text-4xl font-black shadow-md leading-none">${index + 1}</span><span class="break-words line-clamp-2">${song.title}</span></h2>`;
-      html += `<div class="flex gap-2 mb-2 sm:mb-3"><button onclick="showLyrics()" class="bg-stone-800/90 hover:bg-stone-700 border border-stone-600/80 text-teal-400 hover:text-teal-200 px-3 py-1 sm:px-4 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-md"><i class="fa-solid fa-microphone-lines text-sm"></i> View Lyrics</button></div>`;
+      let html = '';
+      if (song.transition) html += `<div class="mb-1 sm:mb-2 bg-teal-950/40 backdrop-blur-sm border-l-8 border-teal-500 p-2 sm:p-3"><p class="text-teal-400 font-black text-sm sm:text-xl md:text-2xl flex items-center gap-2"><i class="fa-solid fa-triangle-exclamation"></i>${song.transition}</p></div>`;
+      html += `<h2 class="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3 uppercase drop-shadow-lg leading-none title-theme"><span class="bg-teal-500 text-stone-950 px-2 py-1 sm:px-3 sm:py-1 rounded-lg text-xl sm:text-3xl lg:text-4xl font-black shadow-md leading-none">${index + 1}</span><span class="break-words line-clamp-2">${song.title}</span></h2>`;
+      html += `<div class="flex gap-2 mb-2 sm:mb-3"><button onclick="showLyrics()" class="btn-theme-lyrics px-3 py-1 sm:px-4 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-md"><i class="fa-solid fa-microphone-lines text-sm"></i> View Lyrics</button></div>`;
       
       if (song.chords && song.chords.length > 0) {
-        html += `<div class="relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 border-stone-700/50 bg-cover bg-center shadow-lg"><div class="absolute inset-0 bg-stone-950/80 z-0"></div><div class="relative z-10 flex flex-wrap gap-2">` + song.chords.map(c => `<button class="bg-stone-950/90 text-teal-300 font-black px-3 py-1.5 sm:px-5 sm:py-2.5 rounded-lg text-xl sm:text-3xl shadow-xl border-2 border-stone-600/80">${c}</button>`).join('') + `</div></div>`;
+        html += `<div class="relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 chord-box-theme"><div class="absolute inset-0 bg-stone-950/80 z-0 chord-overlay-theme"></div><div class="relative z-10 flex flex-col gap-2.5"><div class="flex justify-between items-center w-full border-b border-stone-700/50 pb-2"><span class="text-[10px] sm:text-xs md:text-sm uppercase font-black text-teal-400 tracking-widest drop-shadow-md chord-title-theme">Chords:</span><div class="flex items-center gap-2"><span class="text-[10px] text-stone-400 uppercase font-bold tracking-wider hidden sm:block chord-text-theme">Transpose</span><button onclick="transposeCurrentSong(-1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-minus text-xs"></i></button><button onclick="transposeCurrentSong(1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-plus text-xs"></i></button></div></div><div class="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2.5">` + song.chords.map(c => c === '/' ? `<div class="w-full h-0.5 my-0 block"></div>` : `<button class="chord-btn-theme font-black px-3 py-1.5 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg text-xl sm:text-3xl lg:text-4xl tracking-wider shadow-xl transition-all leading-none">${c}</button>`).join('') + `</div></div></div>`;
       }
       
       html += `<ul class="flex-1 flex flex-col justify-start space-y-1 sm:space-y-2 lg:space-y-3 mt-4">`;
-      if (song.lines) song.lines.forEach(l => { html += `<li class="flex items-start gap-2.5 sm:gap-4 text-stone-200 leading-tight drop-shadow-md"><span class="mt-0.5 flex-shrink-0 w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg bg-stone-900/80 flex items-center justify-center text-teal-400 text-sm sm:text-xl lg:text-2xl border border-stone-700/60 shadow-md"><i class="fa-solid ${l.icon || 'fa-circle-dot'}"></i></span><span class="flex-1 text-lg sm:text-2xl lg:text-4xl font-medium tracking-tight break-words">${l.text}</span></li>`; });
+      if (song.lines) song.lines.forEach(l => { html += `<li class="flex items-start gap-2.5 sm:gap-4 leading-tight drop-shadow-md line-theme"><span class="mt-0.5 flex-shrink-0 w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center text-sm sm:text-xl lg:text-2xl shadow-md icon-theme"><i class="fa-solid ${l.icon || 'fa-circle-dot'}"></i></span><span class="flex-1 text-lg sm:text-2xl lg:text-4xl font-medium tracking-tight break-words">${l.text}</span></li>`; });
       html += `</ul>`;
       
       slideContent.innerHTML = html; applyThemeStyles();
+      broadcastSlideChange(index);
       if(activeProfile.toLowerCase() === 'louis' && document.getElementById('lyrics-modal').classList.contains('hidden')) setTimeout(showLyrics, 100);
     }
 
@@ -508,6 +874,10 @@
     function nextSlide() { if (currentSlideIndex < setlistData.length - 1) renderSlide(currentSlideIndex + 1, 'right'); }
     function prevSlide() { if (currentSlideIndex > 0) renderSlide(currentSlideIndex - 1, 'left'); }
     
+    let touchStartX = 0, touchEndX = 0;
+    slideContainer.addEventListener('touchstart', e => { touchStartX = e.changedTouches[0].screenX; }, { passive: true });
+    slideContainer.addEventListener('touchend', e => { touchEndX = e.changedTouches[0].screenX; if (touchStartX - touchEndX > 60) nextSlide(); else if (touchEndX - touchStartX > 60) prevSlide(); }, { passive: true });
+
     document.addEventListener('keydown', e => {
         if(document.activeElement.tagName === 'INPUT' || document.activeElement.tagName === 'TEXTAREA') return;
         if (e.key === 'ArrowRight' || e.key === 'PageDown') { e.preventDefault(); nextSlide(); }
@@ -519,6 +889,7 @@
         }
     });
 
+    // --- LYRICS & AUTOSCROLL ---
     let isAutoscrolling = false, scrollReq = null, scrollAccumulator = 0;
     function parseChordProLyrics(lyrics) {
       if (!lyrics) return '';
@@ -531,9 +902,9 @@
     function showLyrics() {
       const song = setlistData[currentSlideIndex]; document.getElementById('lyrics-title').textContent = song.title + " - Lyrics";
       const body = document.getElementById('lyrics-body'); body.innerHTML = `<div class="max-w-3xl mx-auto pt-6 pb-64 text-xl md:text-3xl font-medium">${parseChordProLyrics(song.lyrics)}</div>`; body.scrollTop = 0; if (isAutoscrolling) toggleAutoscroll();
-      const m = document.getElementById('lyrics-modal'), c = document.getElementById('lyrics-modal-content'); m.classList.remove('hidden'); void m.offsetWidth; m.classList.replace('opacity-0', 'opacity-100'); c.classList.replace('scale-95', 'scale-100');
+      openModal('lyrics');
     }
-    function closeLyrics() { if (isAutoscrolling) toggleAutoscroll(); const m = document.getElementById('lyrics-modal'), c = document.getElementById('lyrics-modal-content'); m.classList.replace('opacity-100', 'opacity-0'); c.classList.replace('scale-100', 'scale-95'); setTimeout(() => m.classList.add('hidden'), 300); }
+    function closeLyrics() { if (isAutoscrolling) toggleAutoscroll(); closeModal('lyrics'); }
     function autoscrollStep() {
       if (!isAutoscrolling) return;
       const lyricsBody = document.getElementById('lyrics-body');
@@ -542,25 +913,42 @@
       if (Math.ceil(lyricsBody.scrollTop + lyricsBody.clientHeight) >= lyricsBody.scrollHeight - 2) toggleAutoscroll(); else scrollReq = requestAnimationFrame(autoscrollStep);
     }
     function toggleAutoscroll() {
-      isAutoscrolling = !isAutoscrolling;
-      const btnIcon = document.getElementById('autoscroll-icon'), btn = document.getElementById('autoscroll-btn');
-      if (isAutoscrolling) { btnIcon.className = "fa-solid fa-pause"; btn.classList.replace('text-stone-400', 'text-teal-400'); scrollAccumulator = 0; if (scrollReq) cancelAnimationFrame(scrollReq); scrollReq = requestAnimationFrame(autoscrollStep); } 
-      else { btnIcon.className = "fa-solid fa-play"; btn.classList.replace('text-teal-400', 'text-stone-400'); if (scrollReq) { cancelAnimationFrame(scrollReq); scrollReq = null; } }
+      isAutoscrolling = !isAutoscrolling; const btnIcon = document.getElementById('autoscroll-icon');
+      if (isAutoscrolling) { btnIcon.className = "fa-solid fa-pause"; scrollAccumulator = 0; if (scrollReq) cancelAnimationFrame(scrollReq); scrollReq = requestAnimationFrame(autoscrollStep); } 
+      else { btnIcon.className = "fa-solid fa-play"; if (scrollReq) { cancelAnimationFrame(scrollReq); scrollReq = null; } }
     }
 
-    function applyThemeStyles() {} // Theme handling simplified vir HTML limit
-    function setTheme(theme) { currentTheme = theme; }
+    // --- THEME ---
+    function setTheme(theme) { currentTheme = theme; applyThemeStyles(); }
+    function applyThemeStyles() {
+      const isDark = currentTheme === 'dark', isFest = currentTheme === 'festival';
+      document.body.className = `min-h-screen flex flex-col justify-between font-sans selection:bg-teal-600 selection:text-white transition-colors duration-300 relative bg-transparent ${isFest ? 'theme-festival' : isDark ? 'text-stone-200 bg-stone-950' : 'text-stone-900 bg-teal-50'}`;
+      
+      // Update Slide Container
+      slideContainer.className = `w-full h-full flex-1 rounded-xl p-3 sm:p-5 shadow-2xl border flex flex-col transition-colors duration-300 relative ${isFest ? 'bg-white border-black border-l-8 border-l-black' : isDark ? 'bg-stone-900/80 border-stone-800/50 backdrop-blur-md border-l-8 border-l-teal-500' : 'bg-white/80 border-stone-300 backdrop-blur-md border-l-8 border-l-teal-500'}`;
+      
+      // Dynamic internal classes added during render
+      document.querySelectorAll('.title-theme').forEach(el => el.className = `text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3 uppercase leading-none title-theme ${isFest ? 'text-black' : isDark ? 'text-white drop-shadow-lg' : 'text-stone-900 drop-shadow-lg'}`);
+      document.querySelectorAll('.btn-theme-lyrics').forEach(el => el.className = `px-3 py-1 sm:px-4 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 btn-theme-lyrics ${isFest ? 'border border-black bg-white text-black' : isDark ? 'bg-stone-800/90 hover:bg-stone-700 border border-stone-600/80 text-teal-400 shadow-md' : 'bg-white hover:bg-stone-100 border border-stone-300 text-teal-600 shadow-md'}`);
+      document.querySelectorAll('.chord-box-theme').forEach(el => el.className = `relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 chord-box-theme ${isFest ? 'bg-white border-black' : isDark ? 'border-stone-700/50 bg-cover bg-center shadow-lg' : 'border-stone-300 bg-cover bg-center shadow-lg'}`);
+      document.querySelectorAll('.chord-overlay-theme').forEach(el => el.className = `absolute inset-0 z-0 chord-overlay-theme ${isFest ? 'hidden' : 'bg-stone-950/80'}`);
+      document.querySelectorAll('.chord-title-theme').forEach(el => el.className = `text-[10px] sm:text-xs md:text-sm uppercase font-black tracking-widest chord-title-theme ${isFest ? 'text-black' : 'text-teal-400 drop-shadow-md'}`);
+      document.querySelectorAll('.chord-text-theme').forEach(el => el.className = `text-[10px] uppercase font-bold tracking-wider hidden sm:block chord-text-theme ${isFest ? 'text-black' : 'text-stone-400'}`);
+      document.querySelectorAll('.chord-btn-theme').forEach(el => el.className = `font-black px-3 py-1.5 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg text-xl sm:text-3xl lg:text-4xl tracking-wider transition-all leading-none chord-btn-theme ${isFest ? 'bg-white text-black border-2 border-black' : isDark ? 'bg-stone-950/90 hover:bg-stone-900 border-2 border-stone-600/80 text-teal-300 shadow-xl' : 'bg-white hover:bg-stone-100 border-2 border-stone-300 text-teal-700 shadow-xl'}`);
+      document.querySelectorAll('.line-theme').forEach(el => el.className = `flex items-start gap-2.5 sm:gap-4 leading-tight line-theme ${isFest ? 'text-black font-bold' : isDark ? 'text-stone-200 drop-shadow-md' : 'text-stone-800 drop-shadow-md'}`);
+      document.querySelectorAll('.icon-theme').forEach(el => el.className = `mt-0.5 flex-shrink-0 w-7 h-7 sm:w-10 sm:h-10 lg:w-12 lg:h-12 rounded-lg flex items-center justify-center text-sm sm:text-xl lg:text-2xl icon-theme ${isFest ? 'border-2 border-black text-black' : isDark ? 'bg-stone-900/80 border border-stone-700/60 text-teal-400 shadow-md' : 'bg-stone-200/80 border border-stone-300 text-teal-600 shadow-md'}`);
+    }
 
+    // --- INIT ---
     window.onload = function() {
-      loadSetlistData(); populateSelector(); initProfilesUI(); updateTimerDisplay(); renderSlide(0);
+      loadSetlistData(); populateSelector(); initProfilesUI(); updateTimerDisplay(); renderSlide(0); checkWakeLockSupport();
+      
+      const tapBtn = document.getElementById('tap-btn'); let tapTimes = [];
+      if (tapBtn) tapBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); const t = Date.now(); if (tapTimes.length > 0 && t - tapTimes[tapTimes.length - 1] > 2000) tapTimes = []; tapTimes.push(t); if (tapTimes.length > 4) tapTimes.shift(); tapBtn.classList.remove('text-stone-300'); tapBtn.classList.add('text-teal-400', 'border-teal-400', 'bg-stone-700'); setTimeout(() => { tapBtn.classList.add('text-stone-300'); tapBtn.classList.remove('text-teal-400', 'border-teal-400', 'bg-stone-700'); }, 100); if (tapTimes.length >= 2) { metronomeBpm = Math.max(50, Math.min(240, Math.round(60000 / ((tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1))))); document.getElementById('bpm-display').textContent = `${metronomeBpm} BPM`; document.getElementById('bpm-slider').value = metronomeBpm; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } } });
+      document.getElementById('bpm-slider').addEventListener('input', (e) => { metronomeBpm = parseInt(e.target.value); document.getElementById('bpm-display').textContent = `${metronomeBpm} BPM`; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } });
     };
 
-    // --- SERVICE WORKER REGISTRATION ---
-    if ('serviceWorker' in navigator) {
-      window.addEventListener('load', () => {
-        navigator.serviceWorker.register('sw.js').then(r => console.log('SW registered')).catch(e => console.log('SW error', e));
-      });
-    }
+    if ('serviceWorker' in navigator) { window.addEventListener('load', () => { navigator.serviceWorker.register('sw.js').then(()=>console.log('SW ok')).catch(()=>console.log('SW fail')); }); }
   </script>
 </body>
 </html>
