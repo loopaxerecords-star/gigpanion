@@ -1,5 +1,5 @@
 ```javascript
-const CACHE_NAME = 'gigpanion-pro-v1';
+const CACHE_NAME = 'gigpanion-v1';
 
 // The essential files required to load the app offline
 const ASSETS_TO_CACHE = [

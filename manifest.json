@@ -1,6 +1,6 @@
 ```json
 {
-  "name": "Gigpanion Pro",
+  "name": "Gigpanion",
   "short_name": "Gigpanion",
   "start_url": "/index.html",
   "display": "standalone",
@@ -19,5 +19,6 @@
     }
   ]
 }
+
 
 ```
