@@ -746,25 +746,58 @@
       if (metronomeContext.state === 'suspended') metronomeContext.resume();
       
       const freqs = getChordFrequencies(chordName);
-      if (!freqs) return;
+      if (!freqs || freqs.length === 0) return;
       
       const now = metronomeContext.currentTime;
+
+      // FIX: Calculate safe volume levels so the sum of all notes doesn't exceed 1.0 (clipping)
+      // We cap the entire chord's peak volume at ~0.3 to leave headroom for rapid tapping
+      const peakVolume = 0.3 / freqs.length;
+      const sustainVolume = 0.08 / freqs.length;
+
       freqs.forEach((freq, idx) => {
         const osc1 = metronomeContext.createOscillator();
         const osc2 = metronomeContext.createOscillator();
-        osc1.type = 'sine'; osc2.type = 'triangle';
-        osc1.frequency.value = freq; osc2.frequency.value = freq;
-        
+        const filter = metronomeContext.createBiquadFilter();
         const gainNode = metronomeContext.createGain();
-        osc1.connect(gainNode); osc2.connect(gainNode); gainNode.connect(metronomeContext.destination);
-        
-        const delay = idx * 0.01; 
-        gainNode.gain.setValueAtTime(0, now + delay);
-        gainNode.gain.linearRampToValueAtTime(0.2, now + delay + 0.02); 
-        gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 2.5); 
-        
-        osc1.start(now + delay); osc2.start(now + delay);
-        osc1.stop(now + delay + 3); osc2.stop(now + delay + 3);
+
+        // Strum effect
+        const strumDelay = idx * 0.03; 
+        const startTime = now + strumDelay;
+
+        // Sound Design: Electric Piano / Rhodes vibe
+        osc1.type = 'triangle';
+        osc2.type = 'sine';
+        osc2.detune.value = 8; // Slight chorus effect
+
+        osc1.frequency.setValueAtTime(freq, startTime);
+        osc2.frequency.setValueAtTime(freq, startTime);
+
+        // Filter out harsh highs
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(1200, startTime); // Lowered slightly to make it even warmer
+        filter.Q.value = 1;
+
+        // ADSR Envelope
+        gainNode.gain.setValueAtTime(0, startTime);
+        // Fast attack
+        gainNode.gain.linearRampToValueAtTime(peakVolume, startTime + 0.02);
+        // Decay to sustain
+        gainNode.gain.exponentialRampToValueAtTime(sustainVolume, startTime + 0.4);
+        // Long release
+        gainNode.gain.exponentialRampToValueAtTime(0.001, startTime + 3.0);
+
+        // Connections
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(gainNode);
+        gainNode.connect(metronomeContext.destination);
+
+        // Start/Stop
+        osc1.start(startTime);
+        osc2.start(startTime);
+        osc1.stop(startTime + 3.5);
+        osc2.stop(startTime + 3.5);
       });
     }
 
@@ -993,4 +1026,6 @@
   </script>
 </body>
 </html>
+
+
 
