@@ -1,13 +1,14 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gigpanion Pro</title>
   
   <link rel="manifest" href="manifest.json">
   <meta name="theme-color" content="#14b8a6">
 
-  <title>Gigpanion Pro</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <style>
@@ -47,8 +48,10 @@
 </head>
 <body class="text-stone-200 min-h-screen flex flex-col justify-between font-sans selection:bg-teal-600 selection:text-white transition-colors duration-300 relative bg-transparent">
   
+  <!-- Print Area -->
   <div id="print-area" class="hidden"></div>
 
+  <!-- Background Overlays -->
   <div class="fixed inset-0 z-[-1] print:hidden">
     <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1598387181032-a310322a51f3?auto=format&fit=crop&q=80&w=2000')] bg-cover bg-center"></div>
     <div id="app-bg-overlay" class="absolute inset-0 bg-stone-950/85 transition-colors duration-300"></div>
@@ -56,13 +59,16 @@
   
   <div id="stage-flash-overlay" class="print:hidden"></div>
   
+  <!-- Drummer Mode Overlay -->
   <div id="drummer-mode-overlay" onclick="toggleDrummerMode()" class="fixed inset-0 bg-black z-[9990] opacity-0 pointer-events-none transition-opacity duration-300 flex items-center justify-center flex-col cursor-pointer print:hidden">
     <i class="fa-solid fa-drum text-stone-900 text-[8rem] mb-6"></i>
     <p class="text-stone-800 font-black uppercase tracking-[0.3em] text-lg sm:text-xl">Tap anywhere to exit</p>
   </div>
 
+  <!-- Toast -->
   <div id="toast-notification" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-2.5 rounded-full shadow-[0_0_15px_rgba(0,0,0,0.5)] transition-all duration-300 transform translate-y-20 opacity-0 pointer-events-none z-[10050] font-black tracking-widest text-xs uppercase flex items-center gap-2 print:hidden"></div>
 
+  <!-- Help Modal -->
   <div id="help-modal" class="fixed inset-0 bg-black/90 z-[10015] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="help-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -76,6 +82,7 @@
     </div>
   </div>
 
+  <!-- Vault & Gig Builder Modal -->
   <div id="vault-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="vault-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -90,22 +97,22 @@
          <button onclick="autoGenerateSetlist()" class="py-2 px-4 bg-teal-600 hover:bg-teal-500 text-stone-950 font-black uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm"><i class="fa-solid fa-wand-magic-sparkles mr-2"></i> Smart Generate Set</button>
          <button onclick="saveGigToHistory()" class="py-2 px-4 bg-stone-800 hover:bg-stone-700 text-stone-300 font-bold uppercase tracking-widest rounded-lg transition-colors shadow-md text-sm border border-stone-700"><i class="fa-solid fa-clock-rotate-left mr-2"></i> Save to History</button>
       </div>
-      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 flex flex-col gap-4" id="vault-list-container">
-         </div>
+      <div class="p-4 overflow-y-auto flex-1 bg-stone-950/50 flex flex-col gap-4" id="vault-list-container"></div>
     </div>
   </div>
 
+  <!-- History Modal -->
   <div id="history-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="history-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
         <h3 class="text-xl font-black text-teal-400 uppercase tracking-widest drop-shadow-md"><i class="fa-solid fa-clock-rotate-left mr-2"></i>Gig History</h3>
         <button onclick="closeModal('history')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 space-y-4" id="history-list-container">
-      </div>
+      <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 space-y-4" id="history-list-container"></div>
     </div>
   </div>
 
+  <!-- Manage/Edit Songs Modal -->
   <div id="manage-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="manage-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-3xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -119,6 +126,7 @@
     </div>
   </div>
 
+  <!-- Profiles Modal -->
   <div id="profiles-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="profiles-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -133,6 +141,7 @@
     </div>
   </div>
 
+  <!-- Reorder Modal -->
   <div id="reorder-modal" class="fixed inset-0 bg-black/90 z-[10005] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="reorder-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-2xl max-h-[85vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -143,6 +152,7 @@
     </div>
   </div>
 
+  <!-- Tuner Modal -->
   <div id="tuner-modal" class="fixed inset-0 bg-black/90 z-[10010] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="tuner-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-lg rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden relative">
       <div class="flex justify-between items-center p-4 border-b border-stone-800/50">
@@ -162,6 +172,7 @@
     </div>
   </div>
 
+  <!-- Song Editor Modal -->
   <div id="editor-modal" class="fixed inset-0 bg-black/95 z-[10010] hidden flex-col items-center justify-center p-2 sm:p-4 backdrop-blur-md opacity-0 transition-opacity duration-300 print:hidden">
     <div id="editor-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[95vh] rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
       <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50">
@@ -188,8 +199,19 @@
             <div><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Chords (Comma Separated)</label><input type="text" id="edit-chords" class="w-full bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 font-mono text-sm"></div>
           </div>
           <div class="space-y-3 flex flex-col">
-            <div class="flex-1 flex flex-col"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Performance Notes</label><textarea id="edit-notes" class="w-full h-24 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea></div>
-            <div class="flex-1 flex flex-col"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics (Use [C] tags for chords)</label><textarea id="edit-lyrics" class="w-full h-48 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none"></textarea></div>
+            <div class="flex-1 flex flex-col">
+              <div class="flex justify-between items-end mb-1">
+                <label class="block text-xs font-bold text-stone-400 uppercase">Performance Notes</label>
+                <div class="flex gap-1.5 flex-wrap justify-end">
+                  <button type="button" onclick="addCueTag('Bass Swell')" class="text-[9px] font-bold uppercase tracking-wider bg-stone-700 hover:bg-teal-600 text-stone-200 hover:text-stone-900 px-2 py-0.5 rounded transition-colors shadow-sm">+ Bass Swell</button>
+                  <button type="button" onclick="addCueTag('Kick-on beat')" class="text-[9px] font-bold uppercase tracking-wider bg-stone-700 hover:bg-teal-600 text-stone-200 hover:text-stone-900 px-2 py-0.5 rounded transition-colors shadow-sm">+ Kick-on</button>
+                  <button type="button" onclick="addCueTag('Capo 5')" class="text-[9px] font-bold uppercase tracking-wider bg-stone-700 hover:bg-teal-600 text-stone-200 hover:text-stone-900 px-2 py-0.5 rounded transition-colors shadow-sm">+ Capo 5</button>
+                  <button type="button" onclick="addCueTag('Capo 7')" class="text-[9px] font-bold uppercase tracking-wider bg-stone-700 hover:bg-teal-600 text-stone-200 hover:text-stone-900 px-2 py-0.5 rounded transition-colors shadow-sm">+ Capo 7</button>
+                </div>
+              </div>
+              <textarea id="edit-notes" class="w-full h-24 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none font-sans" placeholder="Tap a cue tag above or type custom notes..."></textarea>
+            </div>
+            <div class="flex-1 flex flex-col"><label class="block text-xs font-bold text-stone-400 uppercase mb-1">Lyrics (Use [C] tags for chords)</label><textarea id="edit-lyrics" class="w-full h-48 bg-stone-800 border border-stone-700 rounded p-2 text-white focus:outline-none focus:border-teal-500 text-sm resize-none font-mono"></textarea></div>
           </div>
         </div>
       </div>
@@ -200,6 +222,7 @@
     </div>
   </div>
 
+  <!-- Lyrics Modal -->
   <div id="lyrics-modal" class="fixed inset-0 bg-black/90 z-[10000] hidden flex-col items-center justify-center p-4 sm:p-6 backdrop-blur-sm opacity-0 transition-opacity duration-300 print:hidden">
     <div id="lyrics-modal-content" class="bg-stone-900 border border-stone-700 w-full max-w-4xl max-h-[90vh] h-full rounded-xl flex flex-col shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden relative">
       <div class="flex justify-between items-center p-3 sm:p-4 border-b border-stone-800/50 gap-2 sm:gap-4 flex-wrap sm:flex-nowrap bg-stone-900 z-10 shadow-md">
@@ -215,6 +238,7 @@
     </div>
   </div>
 
+  <!-- Header -->
   <header class="bg-stone-900/70 border-b border-stone-800 sticky top-0 z-40 backdrop-blur-md px-4 py-2 transition-colors duration-300 print:hidden">
     <div class="max-w-4xl mx-auto flex items-center justify-between">
       <div class="flex items-center gap-2">
@@ -240,6 +264,7 @@
     </div>
   </header>
 
+  <!-- Settings Panel -->
   <div id="settings-panel" class="hidden bg-stone-900/80 backdrop-blur-md border-b border-stone-800 px-4 py-4 transition-all duration-300 print:hidden absolute top-[52px] left-0 right-0 z-30 max-h-[80vh] overflow-y-auto">
     <div class="max-w-4xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-4">
       
@@ -265,7 +290,7 @@
         <span class="text-xs font-bold text-stone-400 block mb-2 uppercase tracking-widest">Rehearsal Metronome</span>
         <div class="flex items-center gap-3 mb-3">
           <div class="flex gap-2">
-            <button id="metronome-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md"><i class="fa-solid fa-play"></i></button>
+            <button id="metronome-btn" onclick="toggleMetronomePlay()" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md"><i class="fa-solid fa-play"></i></button>
             <button id="mute-btn" onclick="toggleMute()" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-teal-500 flex items-center justify-center transition-colors shadow-md"><i id="mute-icon" class="fa-solid fa-volume-high"></i></button>
             <button id="tap-btn" class="w-10 h-10 rounded-full bg-stone-800/80 hover:bg-stone-700 border border-stone-700/50 text-stone-300 flex items-center justify-center transition-colors shadow-md touch-none"><span class="text-[10px] font-black pointer-events-none">TAP</span></button>
           </div>
@@ -329,10 +354,6 @@
           <button onclick="document.getElementById('import-file').click()" class="w-full py-2 px-2 rounded text-[10px] sm:text-xs border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-teal-400 font-bold transition-all shadow-md"><i class="fa-solid fa-upload"></i> Import File</button>
           <input type="file" id="import-file" class="hidden" accept=".json" onchange="importSetlist(event)">
         </div>
-        
-        <div class="pt-3 mt-3 border-t border-stone-800/60">
-           <button onclick="openModal('help')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-circle-question"></i> Open App Manual</button>
-        </div>
       </div>
     </div>
   </div>
@@ -344,6 +365,7 @@
   <main class="flex-1 flex flex-col justify-center items-center p-2 sm:p-4 md:p-6 select-none relative max-w-5xl mx-auto w-full z-10 h-full overflow-hidden print:hidden">
     <div id="slide-container" class="w-full h-full flex-1 bg-stone-900/80 backdrop-blur-md rounded-xl p-3 sm:p-5 shadow-2xl border-l-8 border-l-teal-500 border border-stone-800/50 flex flex-col transition-colors duration-300 relative">
       
+      <!-- Canvas for Drawing Overlay -->
       <canvas id="draw-canvas" class="absolute inset-0 z-30 hidden touch-none" style="width: 100%; height: 100%;"></canvas>
 
       <div class="flex justify-between items-center border-b border-stone-700/50 pb-1 mb-1 z-40 relative">
@@ -352,6 +374,7 @@
       </div>
       <div id="slide-content" class="flex-1 flex flex-col justify-between min-h-0 overflow-y-auto overflow-x-hidden pr-1 pb-4 z-20 relative"></div>
       
+      <!-- Audio Player -->
       <div id="audio-player-container" class="hidden mt-2 p-2 bg-stone-900 rounded border border-stone-700 flex items-center justify-between z-40 relative">
           <span class="text-xs font-bold text-stone-400"><i class="fa-solid fa-headphones mr-2 text-teal-500"></i>Backing Track</span>
           <audio id="slide-audio-player" controls class="h-8 w-64"></audio>
@@ -367,13 +390,7 @@
     </div>
   </main>
 
-  <footer class="bg-stone-900/70 border-t border-stone-800 py-2 px-4 backdrop-blur-md transition-colors duration-300 z-10 print:hidden">
-    <div class="max-w-4xl mx-auto flex flex-col items-center justify-center text-center">
-      <span class="text-[9px] text-stone-400 tracking-widest uppercase drop-shadow-sm">Gigpanion Rig</span>
-      <span class="text-xs font-black text-stone-300 tracking-widest drop-shadow-sm">2026 ROAD READY</span>
-    </div>
-  </footer>
-
+  <!-- Firebase Integration Script -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js';
     import { getAuth, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js';
@@ -398,17 +415,15 @@
         window.firebaseSetDoc = setDoc;
         window.firebaseDoc = doc;
         
-        // Luister na wolk veranderinge as internet beskikbaar is
         onSnapshot(doc(db, 'band_data', 'active_gig'), (snap) => {
             if(snap.exists() && snap.data().songs) {
-                // Moenie plaaslik oorskryf as ons pas self gestoor het nie om loops te verhoed.
-                // In 'n vinnige Vanilla setup, is BroadcastChannel veiliger vir intydse sync.
                 console.log("Firebase sync connected.");
             }
         });
     } catch(e) { console.error("Firebase init skipped/failed", e); }
   </script>
 
+  <!-- Hoof Vanilla JS Logika -->
   <script>
     const chromaticScale = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'Bb', 'B'];
     const defaultBandOptions = ['Louis', 'Simon', 'Jan Hendrik', 'Vincent'];
@@ -427,6 +442,14 @@
     function sendMidiProgramChange(pcNum) {
         if (!midiOutput || pcNum === null || pcNum === '') return;
         try { midiOutput.send([0xC0, parseInt(pcNum)]); console.log(`MIDI PC: ${pcNum}`); } catch(e) {}
+    }
+
+    // --- QUICK CUE TAGS ---
+    function addCueTag(tag) {
+        const notesField = document.getElementById('edit-notes');
+        const currentVal = notesField.value.trim();
+        notesField.value = currentVal ? currentVal + '\n' + tag : tag;
+        notesField.focus(); 
     }
 
     // --- DRAWING CANVAS ---
@@ -469,12 +492,9 @@
     function loadSetlistData() {
       const savedSetlist = localStorage.getItem('pca_custom_setlist_v2');
       const savedVault = localStorage.getItem('pca_vault_v2');
-      
       const defaults = [{ id: "song1", title: "My First Song", bpm: 120, timeSig: "4/4", feel: "1/4", chords: ["G", "C", "D"], lines: [{ text: "Welcome to Gigpanion Pro!", icon: "fa-music" }], lyrics: "Welcome to your rig!" }];
-      
       try { setlistData = savedSetlist ? JSON.parse(savedSetlist) : JSON.parse(JSON.stringify(defaults)); } catch(e) { setlistData = defaults; }
       try { vaultData = savedVault ? JSON.parse(savedVault) : JSON.parse(JSON.stringify(defaults)); } catch(e) { vaultData = defaults; }
-      
       applySavedOrder();
     }
 
@@ -482,8 +502,6 @@
       localStorage.setItem('pca_custom_setlist_v2', JSON.stringify(setlistData));
       localStorage.setItem('pca_setlist_order_v2', JSON.stringify(setlistData.map(s => s.id)));
       localStorage.setItem('pca_vault_v2', JSON.stringify(vaultData));
-      
-      // Optionele Firebase backup as window.firebaseDB bestaan
       if(window.firebaseDB && window.firebaseSetDoc) {
           window.firebaseSetDoc(window.firebaseDoc(window.firebaseDB, 'band_data', 'active_gig'), { songs: setlistData }).catch(()=>{});
       }
@@ -530,39 +548,24 @@
         const container = document.getElementById('vault-list-container'); container.innerHTML = '';
         container.innerHTML += `<h4 class="font-bold text-white uppercase mb-2 border-b border-stone-700 pb-1">Active Setlist (${setlistData.length})</h4><div class="space-y-2 mb-6">` + 
           setlistData.map((s,i) => `<div class="flex justify-between bg-stone-800 p-2 rounded border border-stone-700"><span><span class="text-teal-500 font-black mr-2">${i+1}.</span> ${s.title}</span><span class="text-xs text-stone-400">${s.bpm} BPM</span></div>`).join('') + `</div>`;
-        
         container.innerHTML += `<h4 class="font-bold text-white uppercase mb-2 border-b border-stone-700 pb-1">Master Vault (${vaultData.length})</h4><div class="grid grid-cols-1 sm:grid-cols-2 gap-2">` + 
           vaultData.map(s => `<div class="text-sm bg-stone-950 p-2 rounded border border-stone-800 flex justify-between items-center"><span>${s.title}</span><button onclick="addFromVault('${s.id}')" class="text-teal-500 hover:text-white"><i class="fa-solid fa-plus"></i></button></div>`).join('') + `</div>`;
     }
-    
-    function addFromVault(id) {
-        const song = vaultData.find(s=>s.id===id);
-        if(song) { setlistData.push({...song, id: song.id + '-' + Date.now()}); saveCustomSetlist(); renderVaultList(); populateSelector(); renderSlide(currentSlideIndex); showToast("Added to Gig!"); }
-    }
-
+    function addFromVault(id) { const song = vaultData.find(s=>s.id===id); if(song) { setlistData.push({...song, id: song.id + '-' + Date.now()}); saveCustomSetlist(); renderVaultList(); populateSelector(); renderSlide(currentSlideIndex); showToast("Added to Gig!"); } }
     function autoGenerateSetlist() {
-        const mins = parseInt(document.getElementById('auto-min').value) || 45;
-        const targetSongs = Math.max(1, Math.floor(mins / 4));
-        let shuffled = [...vaultData].sort(() => 0.5 - Math.random());
-        setlistData = shuffled.slice(0, targetSongs);
+        const mins = parseInt(document.getElementById('auto-min').value) || 45; const targetSongs = Math.max(1, Math.floor(mins / 4));
+        let shuffled = [...vaultData].sort(() => 0.5 - Math.random()); setlistData = shuffled.slice(0, targetSongs);
         saveCustomSetlist(); populateSelector(); renderSlide(0); closeModal('vault'); showToast(`Smart Setlist Created (${targetSongs} songs)`);
     }
-
     function saveGigToHistory() {
-        const venue = prompt("Enter Venue Name to save to History:");
-        if(!venue) return;
+        const venue = prompt("Enter Venue Name to save to History:"); if(!venue) return;
         const newRecord = { date: new Date().toISOString().split('T')[0], venue, songs: setlistData.map(s=>s.title) };
-        gigHistory = [newRecord, ...gigHistory];
-        localStorage.setItem('pca_gig_history_v2', JSON.stringify(gigHistory));
-        showToast("Saved to History!");
+        gigHistory = [newRecord, ...gigHistory]; localStorage.setItem('pca_gig_history_v2', JSON.stringify(gigHistory)); showToast("Saved to History!");
     }
-
     function renderHistoryList() {
         const container = document.getElementById('history-list-container'); container.innerHTML = '';
         if(gigHistory.length === 0) { container.innerHTML = `<p class="text-stone-500 text-center">No past gigs recorded yet.</p>`; return; }
-        gigHistory.forEach((gig) => {
-            container.innerHTML += `<div class="bg-stone-800 border border-stone-700 rounded-lg p-4"><div class="flex justify-between items-start mb-2"><h4 class="font-black text-white text-lg">${gig.venue}</h4><span class="text-xs font-bold text-teal-500 bg-teal-950 px-2 py-1 rounded">${gig.date}</span></div><p class="text-sm text-stone-400 leading-relaxed"><strong>Setlist:</strong> ${gig.songs.join(' → ')}</p></div>`;
-        });
+        gigHistory.forEach((gig) => { container.innerHTML += `<div class="bg-stone-800 border border-stone-700 rounded-lg p-4"><div class="flex justify-between items-start mb-2"><h4 class="font-black text-white text-lg">${gig.venue}</h4><span class="text-xs font-bold text-teal-500 bg-teal-950 px-2 py-1 rounded">${gig.date}</span></div><p class="text-sm text-stone-400 leading-relaxed"><strong>Setlist:</strong> ${gig.songs.join(' → ')}</p></div>`; });
     }
 
     // --- STAGE TIMER ---
@@ -583,18 +586,13 @@
     // --- LIVE SYNC ---
     let syncMode = localStorage.getItem('pca_sync_mode_v2') || 'off'; 
     let syncChannel = new BroadcastChannel('gigpanion_sync_channel');
-    syncChannel.onmessage = (e) => {
-        if(syncMode === 'slave' && e.data.type === 'SLIDE_CHANGE' && e.data.index !== currentSlideIndex) {
-            renderSlide(e.data.index); showToast("Sync: Moved to Song " + (e.data.index + 1));
-        }
-    };
+    syncChannel.onmessage = (e) => { if(syncMode === 'slave' && e.data.type === 'SLIDE_CHANGE' && e.data.index !== currentSlideIndex) { renderSlide(e.data.index); showToast("Sync: Moved to Song " + (e.data.index + 1)); } };
     function broadcastSlideChange(index) { if(syncMode === 'master') syncChannel.postMessage({ type: 'SLIDE_CHANGE', index: index }); }
     function setSyncMode(mode) { syncMode = mode; localStorage.setItem('pca_sync_mode_v2', mode); showToast("Sync Mode: " + mode.toUpperCase()); }
 
     // --- TRANSPOSE ---
     function transposeChordString(chord, steps) {
-      if (!chord || chord === '/') return chord;
-      const match = chord.match(/^([A-G][#b]?)(.*)$/i); if (!match) return chord;
+      if (!chord || chord === '/') return chord; const match = chord.match(/^([A-G][#b]?)(.*)$/i); if (!match) return chord;
       let rootUpper = match[1].charAt(0).toUpperCase() + match[1].slice(1), rest = match[2];
       let rootIndex = chromaticScale.findIndex(c => c === rootUpper);
       if (rootIndex === -1) { const flatsMap = {'Db': 'C#', 'Eb': 'D#', 'Gb': 'F#', 'Ab': 'G#'}; if (flatsMap[rootUpper]) rootIndex = chromaticScale.indexOf(flatsMap[rootUpper]); }
@@ -616,8 +614,7 @@
         const select = document.getElementById('active-profile-select');
         select.innerHTML = '<option value="none">None (Standard)</option>';
         Object.keys(bandProfiles).forEach(name => { select.innerHTML += `<option value="${name}">${name}</option>`; });
-        select.value = activeProfile;
-        document.getElementById('sync-mode-select').value = syncMode;
+        select.value = activeProfile; document.getElementById('sync-mode-select').value = syncMode;
     }
     function setActiveProfile(val) {
         activeProfile = val; localStorage.setItem('pca_active_profile_v2', activeProfile); showToast("Profile set to " + activeProfile);
@@ -625,12 +622,8 @@
         else if (activeProfile.toLowerCase() === 'louis') showLyrics();
     }
     function renderProfilesList() {
-      const container = document.getElementById('profiles-list-container'); container.innerHTML = '';
-      const keys = Object.keys(bandProfiles);
-      if (keys.length === 0) {
-        container.innerHTML = `<div class="text-center py-6"><p class="text-sm mb-4 text-stone-400">Quick add your band:</p><div class="flex flex-wrap gap-2 justify-center">` + defaultBandOptions.map(name => `<button onclick="addProfile('${name}')" class="px-3 py-1.5 rounded-full border border-stone-600 bg-stone-800 text-stone-300 text-xs font-bold hover:border-teal-500 transition-all">+ ${name}</button>`).join('') + `</div></div>`;
-        return;
-      }
+      const container = document.getElementById('profiles-list-container'); container.innerHTML = ''; const keys = Object.keys(bandProfiles);
+      if (keys.length === 0) { container.innerHTML = `<div class="text-center py-6"><p class="text-sm mb-4 text-stone-400">Quick add your band:</p><div class="flex flex-wrap gap-2 justify-center">` + defaultBandOptions.map(name => `<button onclick="addProfile('${name}')" class="px-3 py-1.5 rounded-full border border-stone-600 bg-stone-800 text-stone-300 text-xs font-bold hover:border-teal-500 transition-all">+ ${name}</button>`).join('') + `</div></div>`; return; }
       keys.forEach(name => { container.innerHTML += `<div class="flex items-center justify-between p-3 bg-stone-800 rounded-lg border border-stone-700"><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full bg-teal-600 flex items-center justify-center text-stone-900 font-black uppercase">${name.charAt(0)}</div><p class="font-bold text-white">${name}</p></div><button onclick="deleteProfile('${name}')" class="w-8 h-8 rounded bg-stone-700 hover:bg-red-600/80 text-red-400 transition-colors"><i class="fa-solid fa-trash"></i></button></div>`; });
     }
     function addProfile(nameOverride) { const name = (nameOverride || document.getElementById('new-profile-name').value).trim(); if (!name) return; bandProfiles[name] = { role: 'Band Member' }; localStorage.setItem('pca_band_profiles_v2', JSON.stringify(bandProfiles)); document.getElementById('new-profile-name').value = ''; renderProfilesList(); initProfilesUI(); showToast("Profile Added"); }
@@ -646,12 +639,8 @@
       const m = document.getElementById('editor-modal'), c = document.getElementById('editor-modal-content');
       document.getElementById('edit-id').value = ''; document.getElementById('edit-title').value = ''; document.getElementById('edit-bpm').value = '120'; document.getElementById('edit-midi-pc').value = ''; document.getElementById('edit-chords').value = ''; document.getElementById('edit-notes').value = ''; document.getElementById('edit-lyrics').value = '';
       if (songId) {
-        document.getElementById('editor-modal-title').textContent = 'Edit Song';
-        const song = setlistData.find(s => s.id === songId);
-        if (song) {
-          document.getElementById('edit-id').value = song.id; document.getElementById('edit-title').value = song.title; document.getElementById('edit-bpm').value = song.bpm; document.getElementById('edit-midi-pc').value = song.midiPC || ''; document.getElementById('edit-chords').value = (song.chords || []).join(', '); document.getElementById('edit-lyrics').value = song.lyrics || '';
-          if (song.lines && Array.isArray(song.lines)) document.getElementById('edit-notes').value = song.lines.map(l => l.text.replace(/<[^>]*>?/gm, '')).join('\n');
-        }
+        document.getElementById('editor-modal-title').textContent = 'Edit Song'; const song = setlistData.find(s => s.id === songId);
+        if (song) { document.getElementById('edit-id').value = song.id; document.getElementById('edit-title').value = song.title; document.getElementById('edit-bpm').value = song.bpm; document.getElementById('edit-midi-pc').value = song.midiPC || ''; document.getElementById('edit-chords').value = (song.chords || []).join(', '); document.getElementById('edit-lyrics').value = song.lyrics || ''; if (song.lines && Array.isArray(song.lines)) document.getElementById('edit-notes').value = song.lines.map(l => l.text.replace(/<[^>]*>?/gm, '')).join('\n'); }
       } else document.getElementById('editor-modal-title').textContent = 'Add New Song';
       
       document.getElementById('edit-audio-file').onchange = (e) => { const file = e.target.files[0]; if(file) currentAudioFileObj = URL.createObjectURL(file); };
@@ -668,9 +657,7 @@
       else { let newId = songObj.id, c = 1; while(setlistData.some(s => s.id === newId)) { newId = `${songObj.id}-${c}`; c++; } songObj.id = newId; setlistData.push(songObj); vaultData.push(songObj); }
       saveCustomSetlist(); populateSelector(); renderSlide(id ? currentSlideIndex : setlistData.length - 1); renderManageList(); closeModal('editor'); currentAudioFileObj = null; showToast(id ? "Updated" : "Added");
     }
-    function deleteSong(songId) {
-      if (confirm("Delete song?")) { const idx = setlistData.findIndex(s => s.id === songId); if (idx !== -1) { setlistData.splice(idx, 1); saveCustomSetlist(); if(setlistData.length === 0) setlistData.push({ id: "blank", title: "Empty", bpm: 120, lines: [], chords: [], lyrics: "" }); populateSelector(); renderSlide(currentSlideIndex >= setlistData.length ? setlistData.length - 1 : currentSlideIndex); renderManageList(); showToast("Deleted"); } }
-    }
+    function deleteSong(songId) { if (confirm("Delete song?")) { const idx = setlistData.findIndex(s => s.id === songId); if (idx !== -1) { setlistData.splice(idx, 1); saveCustomSetlist(); if(setlistData.length === 0) setlistData.push({ id: "blank", title: "Empty", bpm: 120, lines: [], chords: [], lyrics: "" }); populateSelector(); renderSlide(currentSlideIndex >= setlistData.length ? setlistData.length - 1 : currentSlideIndex); renderManageList(); showToast("Deleted"); } } }
 
     // --- REORDER MODAL ---
     let draggedReorderIndex = null;
@@ -694,37 +681,14 @@
     const noteStrings = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     function openTunerModal() { openModal('tuner'); initTuner(); }
     function closeTunerModal() { closeModal('tuner'); stopTuner(); }
-    async function initTuner() {
-      try {
-        tunerStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        tunerContext = new (window.AudioContext || window.webkitAudioContext)();
-        tunerAnalyser = tunerContext.createAnalyser(); tunerAnalyser.fftSize = 4096; 
-        tunerContext.createMediaStreamSource(tunerStream).connect(tunerAnalyser);
-        updateTuner();
-      } catch (err) { document.getElementById('tuner-cents-display').textContent = "Mic access denied."; document.getElementById('tuner-cents-display').className = "text-xl font-bold text-red-500 mb-8 tracking-widest text-center w-full min-h-[1.75rem]"; }
-    }
+    async function initTuner() { try { tunerStream = await navigator.mediaDevices.getUserMedia({ audio: true }); tunerContext = new (window.AudioContext || window.webkitAudioContext)(); tunerAnalyser = tunerContext.createAnalyser(); tunerAnalyser.fftSize = 4096; tunerContext.createMediaStreamSource(tunerStream).connect(tunerAnalyser); updateTuner(); } catch (err) { document.getElementById('tuner-cents-display').textContent = "Mic access denied."; document.getElementById('tuner-cents-display').className = "text-xl font-bold text-red-500 mb-8 tracking-widest text-center w-full min-h-[1.75rem]"; } }
     function stopTuner() { if (tunerReq) cancelAnimationFrame(tunerReq); if (tunerStream) tunerStream.getTracks().forEach(t => t.stop()); if (tunerContext) { tunerContext.close(); tunerContext = null; } }
     function noteFromPitch(f) { return Math.round(12 * (Math.log(f / 440) / Math.log(2))) + 69; }
     function frequencyFromNoteNumber(n) { return 440 * Math.pow(2, (n - 69) / 12); }
     function centsOffFromPitch(f, n) { return Math.floor(1200 * Math.log(f / frequencyFromNoteNumber(n)) / Math.log(2)); }
-    function autoCorrelate(buf, sr) {
-      let SIZE = buf.length, rms = 0; for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / SIZE);
-      if (rms < 0.01) return -1;
-      let r1 = 0, r2 = SIZE - 1, thres = 0.2;
-      for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
-      for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
-      buf = buf.slice(r1, r2); SIZE = buf.length; let c = new Float32Array(SIZE);
-      for (let i = 0; i < SIZE; i++) { for (let j = 0; j < SIZE - i; j++) { c[i] = c[i] + buf[j] * buf[j + i]; } }
-      let d = 0; while (c[d] > c[d + 1]) d++;
-      let maxval = -1, maxpos = -1;
-      for (let i = d; i < SIZE; i++) { if (c[i] > maxval) { maxval = c[i]; maxpos = i; } }
-      let T0 = maxpos, x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1]; let a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2;
-      if (a) T0 = T0 - b / (2 * a); return sr / T0;
-    }
+    function autoCorrelate(buf, sr) { let SIZE = buf.length, rms = 0; for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i]; rms = Math.sqrt(rms / SIZE); if (rms < 0.01) return -1; let r1 = 0, r2 = SIZE - 1, thres = 0.2; for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; } for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; } buf = buf.slice(r1, r2); SIZE = buf.length; let c = new Float32Array(SIZE); for (let i = 0; i < SIZE; i++) { for (let j = 0; j < SIZE - i; j++) { c[i] = c[i] + buf[j] * buf[j + i]; } } let d = 0; while (c[d] > c[d + 1]) d++; let maxval = -1, maxpos = -1; for (let i = d; i < SIZE; i++) { if (c[i] > maxval) { maxval = c[i]; maxpos = i; } } let T0 = maxpos, x1 = c[T0 - 1], x2 = c[T0], x3 = c[T0 + 1]; let a = (x1 + x3 - 2 * x2) / 2, b = (x3 - x1) / 2; if (a) T0 = T0 - b / (2 * a); return sr / T0; }
     function updateTuner() {
-      if (!tunerAnalyser) return;
-      const buffer = new Float32Array(tunerAnalyser.fftSize); tunerAnalyser.getFloatTimeDomainData(buffer);
-      const pitch = autoCorrelate(buffer, tunerContext.sampleRate);
+      if (!tunerAnalyser) return; const buffer = new Float32Array(tunerAnalyser.fftSize); tunerAnalyser.getFloatTimeDomainData(buffer); const pitch = autoCorrelate(buffer, tunerContext.sampleRate);
       const pitchDisplay = document.getElementById('tuner-pitch-display'), centsDisplay = document.getElementById('tuner-cents-display'), needle = document.getElementById('tuner-needle');
       if (pitch !== -1) {
         const note = noteFromPitch(pitch), cents = centsOffFromPitch(pitch, note);
@@ -739,12 +703,7 @@
     // --- WAKE LOCK LOGIC ---
     let wakeLock = null, isWakeLockEnabled = false;
     function checkWakeLockSupport() { if (!('wakeLock' in navigator)) updateWakeLockUI('unsupported'); }
-    async function requestWakeLock() {
-      if ('wakeLock' in navigator) {
-        try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { if(isWakeLockEnabled && document.visibilityState === 'visible') { updateWakeLockUI(false); isWakeLockEnabled = false; } }); updateWakeLockUI(true); } 
-        catch (err) { isWakeLockEnabled = false; updateWakeLockUI(false); }
-      }
-    }
+    async function requestWakeLock() { if ('wakeLock' in navigator) { try { wakeLock = await navigator.wakeLock.request('screen'); wakeLock.addEventListener('release', () => { if(isWakeLockEnabled && document.visibilityState === 'visible') { updateWakeLockUI(false); isWakeLockEnabled = false; } }); updateWakeLockUI(true); } catch (err) { isWakeLockEnabled = false; updateWakeLockUI(false); } } }
     function releaseWakeLock() { if (wakeLock !== null) { wakeLock.release().then(() => { wakeLock = null; updateWakeLockUI(false); }); } }
     function toggleWakeLock() { const btn = document.getElementById('wake-lock-btn'); if (btn && btn.disabled) return; if (isWakeLockEnabled) { isWakeLockEnabled = false; releaseWakeLock(); } else { isWakeLockEnabled = true; requestWakeLock(); } }
     function updateWakeLockUI(status) {
@@ -755,16 +714,70 @@
     }
     document.addEventListener('visibilitychange', async () => { if (isWakeLockEnabled && wakeLock !== null && document.visibilityState === 'visible') await requestWakeLock(); });
 
+    // --- PIANO CHORD SYNTH ---
+    function getChordFrequencies(chordName) {
+      if (!chordName || chordName === '/') return null;
+      let parts = chordName.split('/'); let mainChord = parts[0].trim(); let bassNote = parts.length > 1 ? parts[1].trim() : null;
+      const regex = /^([A-G][#b]?)(.*)$/i; const match = mainChord.match(regex); if (!match) return null;
+      let rootName = match[1]; rootName = rootName.charAt(0).toUpperCase() + rootName.slice(1); let quality = match[2];
+      const notesMap = { "C": 48, "C#": 49, "Db": 49, "D": 50, "D#": 51, "Eb": 51, "E": 40, "F": 41, "F#": 42, "Gb": 42, "G": 43, "G#": 44, "Ab": 44, "A": 45, "A#": 46, "Bb": 46, "B": 47 };
+      let rootMidi = notesMap[rootName]; if (rootMidi === undefined) return null;
+      let intervals = [0, 4, 7]; 
+      if (quality.match(/m(?!aj)|min|-/i)) intervals[1] = 3; 
+      if (quality.match(/dim|o/i)) { intervals[1] = 3; intervals[2] = 6; } 
+      if (quality.match(/aug|\+/i)) intervals[2] = 8; 
+      if (quality.match(/sus2/i)) intervals[1] = 2; else if (quality.match(/sus/i)) intervals[1] = 5; 
+      if (quality === "5") intervals = [0, 7, 12]; 
+      if (quality.match(/maj7|M7/)) intervals.push(11); else if (quality.match(/dim7/)) intervals.push(9); else if (quality.match(/7/)) intervals.push(10);
+      if (quality.match(/6/)) intervals.push(9);
+      if (quality.match(/add9/)) intervals.push(14); else if (quality.match(/9/)) { if (!intervals.includes(10) && !intervals.includes(11)) intervals.push(10); intervals.push(14); }
+      if (quality.match(/11/)) { if (!intervals.includes(10) && !intervals.includes(11)) intervals.push(10); intervals.push(17); }
+      if (quality.match(/b5/)) { let idx = intervals.indexOf(7); if(idx !== -1) intervals[idx] = 6; }
+      let midiNotes = intervals.map(i => rootMidi + i);
+      if (bassNote) { bassNote = bassNote.charAt(0).toUpperCase() + bassNote.slice(1); let bassMidi = notesMap[bassNote]; if (bassMidi !== undefined) { while (bassMidi >= rootMidi) bassMidi -= 12; midiNotes.push(bassMidi); } }
+      if (midiNotes.length <= 3 && !bassNote) midiNotes.push(rootMidi + 12);
+      midiNotes = [...new Set(midiNotes)].sort((a,b) => a - b);
+      return midiNotes.map(m => 440 * Math.pow(2, (m - 69) / 12));
+    }
+
+    function playChord(chordName) {
+      if (chordName === '/') return;
+      if (!metronomeContext) metronomeContext = new (window.AudioContext || window.webkitAudioContext)();
+      if (metronomeContext.state === 'suspended') metronomeContext.resume();
+      
+      const freqs = getChordFrequencies(chordName);
+      if (!freqs) return;
+      
+      const now = metronomeContext.currentTime;
+      freqs.forEach((freq, idx) => {
+        const osc1 = metronomeContext.createOscillator();
+        const osc2 = metronomeContext.createOscillator();
+        osc1.type = 'sine'; osc2.type = 'triangle';
+        osc1.frequency.value = freq; osc2.frequency.value = freq;
+        
+        const gainNode = metronomeContext.createGain();
+        osc1.connect(gainNode); osc2.connect(gainNode); gainNode.connect(metronomeContext.destination);
+        
+        const delay = idx * 0.01; 
+        gainNode.gain.setValueAtTime(0, now + delay);
+        gainNode.gain.linearRampToValueAtTime(0.2, now + delay + 0.02); 
+        gainNode.gain.exponentialRampToValueAtTime(0.001, now + delay + 2.5); 
+        
+        osc1.start(now + delay); osc2.start(now + delay);
+        osc1.stop(now + delay + 3); osc2.stop(now + delay + 3);
+      });
+    }
+
     // --- METRONOME ---
     let isMetronomeRunning = false, isFlashModeEnabled = false, isMetronomeMuted = false, metronomeBpm = 120, timeSignature = "4/4", metronomeFeel = "1/4", metronomeContext = null, timerID = null, nextNoteTime = 0.0, currentSubdivision = 0;
-    const lookahead = 25.0, scheduleAheadTime = 0.1;
-    let isCountInEnabled = false, countInCounter = 0;
+    const lookahead = 25.0, scheduleAheadTime = 0.1; let isCountInEnabled = false, countInCounter = 0;
     const blinker = document.getElementById('metronome-blinker'), flashOverlay = document.getElementById('stage-flash-overlay');
 
     function toggleCountIn(val) { isCountInEnabled = val; }
     function setTimeSignature(sig) { timeSignature = sig; metronomeFeel = sig === "4/4" ? "1/4" : "macro"; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } }
     function setMetronomeFeel(feel) { metronomeFeel = feel; if (isMetronomeRunning) { stopMetronome(); startMetronome(); } }
-    function toggleMute() { isMetronomeMuted = !isMetronomeMuted; const icon = document.getElementById('mute-icon'); if (isMetronomeMuted) icon.className = "fa-solid fa-volume-xmark"; else icon.className = "fa-solid fa-volume-high"; }
+    function toggleMetronomePlay() { if (isMetronomeRunning) stopMetronome(); else startMetronome(); }
+    function toggleMute() { isMetronomeMuted = !isMetronomeMuted; const icon = document.getElementById('mute-icon'); if(icon) { if (isMetronomeMuted) icon.className = "fa-solid fa-volume-xmark"; else icon.className = "fa-solid fa-volume-high"; } }
     function toggleFlashMode() { isFlashModeEnabled = !isFlashModeEnabled; }
 
     function advanceNote() {
@@ -790,28 +803,54 @@
         osc.start(time); osc.stop(time + 0.06);
       }
       
-      if(trigger && isCountInEnabled && countInCounter > 0) {
-          countInCounter--; if(countInCounter === 0) setTimeout(() => { isMetronomeMuted = true; toggleMute(); toggleMute(); isMetronomeMuted=true; }, (time - metronomeContext.currentTime) * 1000);
+      if(trigger && isCountInEnabled && countInCounter > 0) { 
+          countInCounter--; 
+          if(countInCounter === 0) {
+              setTimeout(() => { 
+                  isMetronomeMuted = true; 
+                  const muteIcon = document.getElementById('mute-icon');
+                  if(muteIcon) muteIcon.className = "fa-solid fa-volume-xmark"; 
+              }, Math.max(0, (time - metronomeContext.currentTime) * 1000)); 
+          }
       }
       
       setTimeout(() => {
         if (trigger) {
-          blinker.className = "w-2 h-2 rounded-full border border-stone-700 inline-block transition-colors duration-75 " + (beatNumber === 0 ? "bg-emerald-500" : "bg-lime-400");
-          if (isFlashModeEnabled) { flashOverlay.style.backgroundColor = (beatNumber === 0) ? '#10b981' : '#a3e635'; flashOverlay.classList.add('flash-active'); setTimeout(() => { flashOverlay.classList.remove('flash-active'); }, 60); }
-          setTimeout(() => { blinker.className = "w-2 h-2 rounded-full border border-stone-700 bg-stone-800 inline-block transition-colors duration-75"; }, 80);
+          if (blinker) blinker.className = "w-2 h-2 rounded-full border border-stone-700 inline-block transition-colors duration-75 " + (beatNumber === 0 ? "bg-emerald-500" : "bg-lime-400");
+          if (isFlashModeEnabled && flashOverlay) { flashOverlay.style.backgroundColor = (beatNumber === 0) ? '#10b981' : '#a3e635'; flashOverlay.classList.add('flash-active'); setTimeout(() => { flashOverlay.classList.remove('flash-active'); }, 60); }
+          setTimeout(() => { if (blinker) blinker.className = "w-2 h-2 rounded-full border border-stone-700 bg-stone-800 inline-block transition-colors duration-75"; }, 80);
         }
       }, Math.max(0, (time - metronomeContext.currentTime) * 1000));
     }
 
     function schedulerLoop() { while (nextNoteTime < metronomeContext.currentTime + scheduleAheadTime) { scheduleNote(currentSubdivision, nextNoteTime); advanceNote(); } timerID = setTimeout(schedulerLoop, lookahead); }
+    
     function startMetronome() {
-      if (!metronomeContext) metronomeContext = new (window.AudioContext || window.webkitAudioContext)();
-      isMetronomeRunning = true; const btn = document.getElementById('metronome-btn'); btn.innerHTML = '<i class="fa-solid fa-pause"></i>'; btn.classList.replace('text-teal-500', 'text-red-500');
+      if (!metronomeContext) { metronomeContext = new (window.AudioContext || window.webkitAudioContext)(); }
+      if (metronomeContext.state === 'suspended') { metronomeContext.resume(); } // FIX: Force audio context awake
+
+      isMetronomeRunning = true; 
+      const btn = document.getElementById('metronome-btn'); 
+      if(btn) { btn.innerHTML = '<i class="fa-solid fa-pause"></i>'; btn.classList.replace('text-teal-500', 'text-red-500'); }
+      
       nextNoteTime = metronomeContext.currentTime + 0.02; currentSubdivision = 0;
-      if(isCountInEnabled) { countInCounter = timeSignature === "4/4" ? 4 : 6; isMetronomeMuted = false; }
+      if(isCountInEnabled) { 
+          countInCounter = timeSignature === "4/4" ? 4 : (timeSignature === "6/8" ? (metronomeFeel === "macro" ? 2 : 6) : 4); 
+          isMetronomeMuted = false; 
+          const muteIcon = document.getElementById('mute-icon');
+          if(muteIcon) muteIcon.className = "fa-solid fa-volume-high"; 
+      }
       schedulerLoop();
     }
-    function stopMetronome() { isMetronomeRunning = false; const btn = document.getElementById('metronome-btn'); btn.innerHTML = '<i class="fa-solid fa-play"></i>'; btn.classList.replace('text-red-500', 'text-teal-500'); clearTimeout(timerID); }
+    
+    function stopMetronome() { 
+        isMetronomeRunning = false; 
+        const btn = document.getElementById('metronome-btn'); 
+        if(btn) { btn.innerHTML = '<i class="fa-solid fa-play"></i>'; btn.classList.replace('text-red-500', 'text-teal-500'); }
+        clearTimeout(timerID); 
+        if (blinker) blinker.className = "w-2 h-2 rounded-full bg-stone-800 inline-block transition-colors duration-75 border border-stone-700"; 
+    }
+    
     function toggleDrummerMode() {
       const mode = document.getElementById('drummer-mode-overlay');
       if (mode.classList.contains('opacity-0')) { mode.classList.replace('opacity-0', 'opacity-100'); mode.classList.replace('pointer-events-none', 'pointer-events-auto'); if (!isFlashModeEnabled) toggleFlashMode(); if (!isMetronomeRunning) startMetronome(); document.getElementById('settings-panel').classList.add('hidden'); } 
@@ -830,7 +869,7 @@
     settingsToggle.addEventListener('click', () => settingsPanel.classList.toggle('hidden'));
 
     function renderSlide(index, direction = '') {
-      if(ctx) ctx.clearRect(0,0, canvas.width, canvas.height); // Clear Canvas
+      if(ctx) ctx.clearRect(0,0, canvas.width, canvas.height); 
       
       if (setlistData.length === 0) { slideContent.innerHTML = `<h2 class="text-2xl text-stone-500 font-bold text-center mt-10">Setlist is empty.</h2>`; songCount.textContent = `SONG 0 OF 0`; progressIndicator.style.width = `0%`; return; }
       if (index < 0 || index >= setlistData.length) return;
@@ -858,7 +897,7 @@
       html += `<div class="flex gap-2 mb-2 sm:mb-3"><button onclick="showLyrics()" class="btn-theme-lyrics px-3 py-1 sm:px-4 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider shadow-md"><i class="fa-solid fa-microphone-lines text-sm"></i> View Lyrics</button></div>`;
       
       if (song.chords && song.chords.length > 0) {
-        html += `<div class="relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 chord-box-theme"><div class="absolute inset-0 bg-stone-950/80 z-0 chord-overlay-theme"></div><div class="relative z-10 flex flex-col gap-2.5"><div class="flex justify-between items-center w-full border-b border-stone-700/50 pb-2"><span class="text-[10px] sm:text-xs md:text-sm uppercase font-black text-teal-400 tracking-widest drop-shadow-md chord-title-theme">Chords:</span><div class="flex items-center gap-2"><span class="text-[10px] text-stone-400 uppercase font-bold tracking-wider hidden sm:block chord-text-theme">Transpose</span><button onclick="transposeCurrentSong(-1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-minus text-xs"></i></button><button onclick="transposeCurrentSong(1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-plus text-xs"></i></button></div></div><div class="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2.5">` + song.chords.map(c => c === '/' ? `<div class="w-full h-0.5 my-0 block"></div>` : `<button class="chord-btn-theme font-black px-3 py-1.5 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg text-xl sm:text-3xl lg:text-4xl tracking-wider shadow-xl transition-all leading-none">${c}</button>`).join('') + `</div></div></div>`;
+        html += `<div class="relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 chord-box-theme"><div class="absolute inset-0 bg-stone-950/80 z-0 chord-overlay-theme"></div><div class="relative z-10 flex flex-col gap-2.5"><div class="flex justify-between items-center w-full border-b border-stone-700/50 pb-2"><span class="text-[10px] sm:text-xs md:text-sm uppercase font-black text-teal-400 tracking-widest drop-shadow-md chord-title-theme">Chords (Tap to play):</span><div class="flex items-center gap-2"><span class="text-[10px] text-stone-400 uppercase font-bold tracking-wider hidden sm:block chord-text-theme">Transpose</span><button onclick="transposeCurrentSong(-1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-minus text-xs"></i></button><button onclick="transposeCurrentSong(1)" class="w-6 h-6 sm:w-8 sm:h-8 rounded bg-stone-900 border border-stone-600 text-teal-400 hover:text-white flex items-center justify-center font-bold shadow-md"><i class="fa-solid fa-plus text-xs"></i></button></div></div><div class="flex flex-wrap justify-center sm:justify-start gap-1.5 sm:gap-2.5">` + song.chords.map(c => c === '/' ? `<div class="w-full h-0.5 my-0 block"></div>` : `<button onclick="playChord('${c}')" class="chord-btn-theme font-black px-3 py-1.5 sm:px-5 sm:py-2.5 lg:px-6 lg:py-3 rounded-lg text-xl sm:text-3xl lg:text-4xl tracking-wider shadow-xl transition-all leading-none">${c}</button>`).join('') + `</div></div></div>`;
       }
       
       html += `<ul class="flex-1 flex flex-col justify-start space-y-1 sm:space-y-2 lg:space-y-3 mt-4">`;
@@ -891,19 +930,23 @@
 
     // --- LYRICS & AUTOSCROLL ---
     let isAutoscrolling = false, scrollReq = null, scrollAccumulator = 0;
+    
     function parseChordProLyrics(lyrics) {
       if (!lyrics) return '';
       return lyrics.split('\n').map(line => {
         if (line.trim() === '') return '<div class="h-6"></div>';
-        return '<div class="chordpro-line">' + line.split(/(\[[^\]]+\])/g).map(p => p.startsWith('[') && p.endsWith(']') ? `<span class="relative inline-block"><span class="chord-badge">${p.slice(1, -1)}</span></span>` : `<span>${p}</span>`).join('') + '</div>';
+        return '<div class="chordpro-line whitespace-pre-wrap">' + line.split(/(\[[^\]]+\])/g).map(p => p.startsWith('[') && p.endsWith(']') ? `<span class="relative inline-block"><span class="chord-badge font-sans">${p.slice(1, -1)}</span></span>` : `<span>${p}</span>`).join('') + '</div>';
       }).join('');
     }
 
     function showLyrics() {
       const song = setlistData[currentSlideIndex]; document.getElementById('lyrics-title').textContent = song.title + " - Lyrics";
-      const body = document.getElementById('lyrics-body'); body.innerHTML = `<div class="max-w-3xl mx-auto pt-6 pb-64 text-xl md:text-3xl font-medium">${parseChordProLyrics(song.lyrics)}</div>`; body.scrollTop = 0; if (isAutoscrolling) toggleAutoscroll();
+      const body = document.getElementById('lyrics-body'); 
+      body.innerHTML = `<div class="max-w-3xl mx-auto pt-6 pb-64 text-xl md:text-3xl font-medium font-mono">${parseChordProLyrics(song.lyrics)}</div>`; 
+      body.scrollTop = 0; if (isAutoscrolling) toggleAutoscroll();
       openModal('lyrics');
     }
+    
     function closeLyrics() { if (isAutoscrolling) toggleAutoscroll(); closeModal('lyrics'); }
     function autoscrollStep() {
       if (!isAutoscrolling) return;
@@ -924,10 +967,8 @@
       const isDark = currentTheme === 'dark', isFest = currentTheme === 'festival';
       document.body.className = `min-h-screen flex flex-col justify-between font-sans selection:bg-teal-600 selection:text-white transition-colors duration-300 relative bg-transparent ${isFest ? 'theme-festival' : isDark ? 'text-stone-200 bg-stone-950' : 'text-stone-900 bg-teal-50'}`;
       
-      // Update Slide Container
       slideContainer.className = `w-full h-full flex-1 rounded-xl p-3 sm:p-5 shadow-2xl border flex flex-col transition-colors duration-300 relative ${isFest ? 'bg-white border-black border-l-8 border-l-black' : isDark ? 'bg-stone-900/80 border-stone-800/50 backdrop-blur-md border-l-8 border-l-teal-500' : 'bg-white/80 border-stone-300 backdrop-blur-md border-l-8 border-l-teal-500'}`;
       
-      // Dynamic internal classes added during render
       document.querySelectorAll('.title-theme').forEach(el => el.className = `text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-2 sm:mb-3 flex items-center gap-2 sm:gap-3 uppercase leading-none title-theme ${isFest ? 'text-black' : isDark ? 'text-white drop-shadow-lg' : 'text-stone-900 drop-shadow-lg'}`);
       document.querySelectorAll('.btn-theme-lyrics').forEach(el => el.className = `px-3 py-1 sm:px-4 sm:py-1.5 rounded text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center gap-2 transition-all active:scale-95 btn-theme-lyrics ${isFest ? 'border border-black bg-white text-black' : isDark ? 'bg-stone-800/90 hover:bg-stone-700 border border-stone-600/80 text-teal-400 shadow-md' : 'bg-white hover:bg-stone-100 border border-stone-300 text-teal-600 shadow-md'}`);
       document.querySelectorAll('.chord-box-theme').forEach(el => el.className = `relative overflow-hidden my-1 sm:my-2 p-3 sm:p-5 rounded-xl border-2 chord-box-theme ${isFest ? 'bg-white border-black' : isDark ? 'border-stone-700/50 bg-cover bg-center shadow-lg' : 'border-stone-300 bg-cover bg-center shadow-lg'}`);
@@ -952,3 +993,4 @@
   </script>
 </body>
 </html>
+
