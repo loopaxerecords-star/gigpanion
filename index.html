@@ -1,4 +1,4 @@
-
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -101,6 +101,11 @@
         <button onclick="closeModal('help')" class="text-stone-400 hover:text-white text-2xl w-10 h-10 flex items-center justify-center rounded-full hover:bg-stone-800 transition-colors"><i class="fa-solid fa-xmark"></i></button>
       </div>
       <div class="p-6 overflow-y-auto flex-1 bg-stone-950/50 text-stone-300 space-y-6">
+        
+        <p class="text-sm text-stone-200 leading-relaxed italic bg-stone-900/50 p-4 rounded-lg border border-stone-700/50 shadow-inner">
+          "Gigpanion is a digital command center for live bands. It completely replaces messy paper setlists, bulky binders of lyrics, standalone metronomes, and guitar tuners. It puts everything a musician needs onto one screen and uses the cloud to keep the entire band perfectly synced on or off stage."
+        </p>
+
         <div><h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-bolt text-teal-500 mr-2"></i>Bluetooth Pedal</h4><ul class="list-disc pl-5 text-sm space-y-1"><li><strong class="text-stone-200">Next/Prev:</strong> PageDown/PageUp keys step through the setlist.</li><li><strong class="text-stone-200">Lyrics & Scroll:</strong> Spacebar opens lyrics and auto-starts scrolling!</li></ul></div>
         <div><h4 class="font-black text-white uppercase tracking-widest mb-2 text-sm"><i class="fa-solid fa-cloud text-teal-500 mr-2"></i>Live Sync</h4><ul class="list-disc pl-5 text-sm space-y-1"><li><strong class="text-stone-200">Master/Slave:</strong> Set one device as Master. Others set as Slave will automatically change songs when the Master does!</li></ul></div>
       </div>
@@ -368,8 +373,9 @@
         </div>
         
         <div class="flex gap-3 mb-3">
-            <button onclick="openTunerModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-music"></i> Guitar Tuner</button>
+            <button onclick="openTunerModal()" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-music"></i> Tuner</button>
             <button onclick="openModal('profiles')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-users"></i> Profiles</button>
+            <button onclick="openModal('help')" class="w-full py-2 px-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-teal-400 hover:text-white font-bold transition-all shadow-md"><i class="fa-solid fa-book-open"></i> Manual</button>
         </div>
         
         <button id="wake-lock-btn" onclick="toggleWakeLock()" class="w-full py-2 px-3 mb-3 rounded text-sm border border-stone-700/80 bg-stone-900/60 hover:bg-stone-800 text-stone-400 hover:text-white font-bold transition-all shadow-md flex items-center justify-center gap-2"><i class="fa-solid fa-mobile-screen"></i> <span id="wake-lock-text">Keep Screen Awake: OFF</span></button>
@@ -1137,4 +1143,4 @@
 </html>
 
 
-
+```
